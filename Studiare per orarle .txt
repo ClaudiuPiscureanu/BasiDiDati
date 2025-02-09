@@ -1,0 +1,3 @@
+strategie di progettazione:
+    top down    pg209
+    botton up   pg211

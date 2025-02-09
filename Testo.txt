@@ -18,3 +18,23 @@ SALE(NUM,)
 POSTI(NUMPOSTO,FILA, SALA, )
 FILM(TITOLO, DURATA, ATTORI, PRODUZIONE)
 PROIEZIONI(FILM,SALA,DATA,PREZZO)
+
+
+
+
+Iniziamo con la formazione delle entita adibite alla parte fisica/logistica del progetto, come prima entità scegliamo Cinema, non fondamentale, ma nell’ottica di espansioni future risulta utile, identificata da un NomeCinema e caratterizzata da un orario di apertura e indirizzo, per una più veloce lettura adoperiamo la scrittura : Cinema (NomeCinema, OrarioApertura, Indirizzo).
+In seguito evidenziamo l’entita Sala ( NumSala, Capienza, Cinema), con un riferimento al Cinema che ospita la sala  e scorre una relazione di componimento. L’entità Posto(Sala, fila, colonna,) con un indice matriciale 26xN con {a,b,...,z}= file e {1,2,...,N}= colonne, poichè l’insieme delle file ha un numero limitato (26) dovremmo affrontare l’eventualita di un numero maggiore, questa casistica non vera prevista dato il seguente studio:
+Grandezza sala 	File( media) 	Posti totali
+Piccola (50-100 posti)	6 - 10 file	8-12 posti per fila
+Media (100-200 posti)	10 - 15 file	10-14 posti per fila
+Grande (200-400 posti)	15 - 20 file	12-18 posti per fila
+IMAX (400+ posti)	20 - 25+ file	15-20 posti per fila
+
+
+
+
+
+
+
+
+

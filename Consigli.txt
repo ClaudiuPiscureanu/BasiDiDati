@@ -1,0 +1,12 @@
+chiede un operazione del sistema
+aggiungere look sui dati
+gestione della concorrenza
+Volume attesso dell intera vita del programma
+decidere ogni quanto devo cancellare i dati
+mettere "seraliazzable"
+
+
+domande:
+    cosa succede in un'eventuale blackauto della corrente?
+        ->rendere le transazioni atominche
+
