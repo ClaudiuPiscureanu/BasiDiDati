@@ -1,0 +1,13 @@
+Questa la specifica che le è stata assegnata dal sistema:
+
+Sistema di gestione di sale cinematografiche
+
+Si vuole realizzare il sistema informativo di una cinema, che si occupi anche della gestione delle prenotazioni.
+Il proprietario del cinema gestisce le sale e la programmazione. Il cinema ha un numero arbitrario di sale, identificato da un numero di sala. In ogni sala c’è un numero arbitrario di posti, ciascuno individuato da una lettera per la fila ed un numero di posto.
+
+In ogni sala vengono proiettati più film quotidianamente. Lo stesso film può essere proiettato più volte in una giornata, in sale differenti. Ogni film ha una durata, un nome, è associato al cast degli attori protagonisti e una casa cinematografica. Lo stesso film, proiettato in orari differenti e in sale differenti, può avere un costo per il biglietto differente, proprio in relazione alla sala e all’orario in cui esso viene proiettato.
+
+Il sistema di prenotazione è tale per cui gli utenti possono prenotarsi per una visione, scegliendo un posto disponibile. Dal momento dell’inizio della procedura di prenotazione, un cliente ha a disposizione 10 minuti per perfezionare la prenotazione. Dopo aver scelto il  posto, al cliente è data la possibilità di inserire i dati relativi alla propria carta di credito (numero, intestatario, data di scadenza, codice CVV). Una volta inseriti questi dati, il sistema restituisce all’utente un codice di prenotazione.
+Fino a 30 minuti dall’inizio della proiezione, il cliente ha la possibilità di annullare la sua prenotazione fornendo al sistema il codice di prenotazione.
+
+A fini statistici, gli amministratori possono generare dei report mensili che mostrano per ciascuna sala quante prenotazioni sono state confermate e quante sono state annullate.
