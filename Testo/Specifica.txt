@@ -1,4 +1,4 @@
-Questa la specifica che le è stata assegnata dal sistema:
+    Questa la specifica che le è stata assegnata dal sistema:
 
 Sistema di gestione di sale cinematografiche
 
