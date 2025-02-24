@@ -1,3 +1,8 @@
 strategie di progettazione:
     top down    pg209
     botton up   pg211
+
+ while (true) {
+            Socket clientSocket = serverSocket.accept();
+            new ClientHandler(clientSocket).start();
+        }

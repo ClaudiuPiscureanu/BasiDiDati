@@ -1,0 +1,36 @@
+come cambiare la password del root dimentica:
+     Ferma il servizio MariaDB/MySQL
+        sudo systemctl stop mariadb
+    Avvia MariaDB/MySQL in modalità sicura
+        sudo mysqld_safe --skip-grant-tables &
+    Connettiti al server MySQL/MariaDB
+        mysql -u root
+    Reimposta la password di root
+        FLUSH PRIVILEGES;
+        ALTER USER 'root'@'localhost' IDENTIFIED BY 'nuova_password';
+        FLUSH PRIVILEGES;
+    Esci
+        exit
+    riavvia il servizio
+        sudo killall mysqld_safe
+        sudo systemctl start mariadb
+
+    per sicurezza usa il comando seguente e riconfigura mariadb
+        sudo mysql_secure_installation
+
+vedere i database presenti: SHOW DATABASES;
+
+
+vedere gli user: SELECT User, Host FROM mysql.user;
+reimpostare passowrd di un utente non root : ALTER USER 'nome_utente'@'localhost' IDENTIFIED BY 'nuova_password';
+
+
+attivare eventi mariadb:
+    SHOW VARIABLES LIKE 'event_scheduler';
+    SET GLOBAL event_scheduler = ON;
+
+
+
+DUMP DEL DB
+    per evitare  ' ' sugli attributi : --skip-comments --skip-quote-names
+    per evitare commenti del tipo /*!....*/ :  mysqldump --skip-comments -u root -p pirexdb | sed '/\/\*.*\*\//d' > backup.sql

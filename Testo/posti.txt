@@ -1,0 +1,5 @@
+ipo di sala	File (medie)	Posti totali
+🎬 Piccola (50-100 posti)	6 - 10 file           8-12 posti per fila
+🎥 Media (100-200 posti)	10 - 15 file	          10-14 posti per fila
+🎞 Grande (200-400 posti)	15 - 20 file	      12-18 posti per fila
+🍿 IMAX / Premium (400+ posti)	20 - 25+ file	  15-20 posti per fila
