@@ -1,3 +1,5 @@
+pws:1234
+
 come cambiare la password del root dimentica:
      Ferma il servizio MariaDB/MySQL
         sudo systemctl stop mariadb
