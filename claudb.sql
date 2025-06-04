@@ -55,7 +55,7 @@ CREATE TABLE posto (
 
 
 CREATE TABLE film(
-    titolo_film VARCHAR(128) NOT NULL PRIMARY KEY,
+    titolo_film VARCHAR(128) NOT NULL,
     durata_minuti TINYINT UNSIGNED NOT NULL CHECK (durata_minuti > 0), -- Durata in minuti
     casa_cinematografica VARCHAR(100),  
     cast_attori TEXT, -- elenco degli attori, in formato JSON, per esempio: [{"id_attore": 1, "nominativo": "Attore 1"}, {"id_attore": 2, "nominativo": "Attore 2"}]
@@ -95,7 +95,7 @@ CREATE TABLE prenotazione(
     data_ora_conferma DATETIME NOT NULL,
     stato_prenotazione ENUM('TEMPORANEA', 'CONFERMATA', 'ANNULLATA', 'SCADUTA') DEFAULT 'TEMPORANEA',
     timestamp_creazione DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,  
-    ticket_pag VARCHAR(50),--verrà memorizzato unicamente un ticket e non le informazioni di pagamento per delegare tutta la logica annessa a programmi esterni 
+    ticket_pag VARCHAR(50), -- verrà memorizzato unicamente un ticket e non le informazioni di pagamento per delegare tutta la logica annessa a programmi esterni 
     timestamp_conferma DATETIME NULL,
     timestamp_scadenza DATETIME NOT NULL, -- Calcolato: creazione + 10 minuti
     PRIMARY KEY(codice_prenotazione),
@@ -175,4 +175,116 @@ CREATE PROCEDURE CreaPrenotazioneTemporanea(
     IN p_fila CHAR(1),
     IN p_numero_posto TINYINT UNSIGNED,
     OUT p_codice_prenotazione VARCHAR(20),
-    OUT p_risultato
+    OUT p_risultato INT -- 1=successo, 0=posto occupato, -1=errore_proiezione, -2=errore_generico 
+)
+BEGIN
+    DECLARE v_num_sala TINYINT UNSIGNED;
+    DECLARE v_data_inizio DATETIME;
+    DECLARE v_prezzo DECIMAL(5,2);
+    DECLARE v_lock_name VARCHAR(100);
+    DECLARE v_session_id VARCHAR(50);
+    DECLARE v_count_existing INT DEFAULT 0;
+    DECLARE v_lock_acquired BOOLEAN DEFAULT FALSE;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        IF v_lock_acquired THEN
+            DELETE FROM distributed_locks WHERE lock_name = v_lock_name AND session_id = v_session_id;
+        END IF;
+        SET p_risultato = -2;
+    END;
+
+    -- genera sessione ID unico 
+    SET v_session_id = CONCAT(CONNECTION_ID(), '_', UNIX_TIMESTAMP(),'_', RAND());
+
+    -- Genera codice prenotazione unico
+    -- Formato del codice: RES[Anno][Mese][ID Proiezione][Fila][Numero Posto][Numero Casuale]
+    SET p_codice_prenotazione = CONCAT('RES',YEAR(NOW()),MONTH(NOW()),LPAD(p_id_proiezione,4,'0'), UPPER(p_fila),LPAD(p_numero_posto,2,'0'),LPAD(floor(RAND() * 1000),3,'0'));
+
+    -- Inizia la transazione
+    START TRANSACTION;
+
+    --verifica che la proiezione esista e recupera i dati necessari
+    SELECT num_sala, data_ora_inizio, prezzo
+    INTO v_num_sala, v_data_inizio, v_prezzo
+    FROM proiezione 
+    WHERE id_proiezione = p_id_proiezione
+        AND data_ora_inizio > NOW()
+        AND stato_proiezione = 'PROGRAMMATA';
+    IF v_num_sala IS NULL THEN
+        SET p_risultato = -1; -- Proiezione non trovata o non valida
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+
+    --creo lock specifico per prosto e proiezione 
+    SET v_lock_name = CONCAT('seat_',p_id_proiezione, '_', v_num_sala, '_', p_fila, '_', p_numero_posto);
+    
+    --acquisisce lock distribuito con timeout 
+    INSERT INTO distributed_locks (lock_name, expires_at, session_id) 
+    VALUES (v_lock_name, DATA_ADD(NOW(), INTERVAL 15 MINUTE), v_session_id)
+    ON DUPLICATE KEY UPDATE lock_name = lock_name, --falisce se lock gia essiste 
+
+    IF ROW_COUNT() = 0 THEN
+        SET p_risultato = 0; --posto in fase di prenotazione da parte di unaltro utente
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+    SET v_lock_acquired = TRUE;
+    -- Verifica se il posto è già prenotato
+    SELECT COUNT(*) INTO v_count_existing
+    from prenotazione
+    WHERE  id_proiezione = p_id_proiezione
+        AND num_sala  = v_num_sala
+        AND fila = p_fila
+        AND numero_posto = p_numero_posto
+        AND stato_prenotazione IN ('TEMPORANEA', 'CONFERMATA');
+    IF v_count_existing > 0 THEN
+        SET p_risultato = 0; -- Posto già prenotato
+        DELETE from distribuited_locks WHERE lock_name = v_lock_name AND session_id = v_session_id;
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+
+    -- Verifica che il posto esista fisicamente
+    SELECT COUNT(*) INTO v_count_existing
+    from posto
+    WHERE num_sala = v_num_sala AND fila = p_fila AND numero_posto = p_numero_posto;
+    IF v_count_existing = 0 THEN
+        SET p_risultato = -1; -- Posto non esistente
+        DELETE from distributed_locks WHERE lock_name = v_lock_name AND session_id = v_session_id;
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+
+
+    -- Inserisce la prenotazione temporanea
+    INSERT into prenotazione(
+        codice_prenotazione, 
+        id_proiezione, 
+        num_sala, 
+        fila, 
+        numero_posto,
+        stato_prenotazione,
+        timestamp_creazione,
+        timestamp_scadenza
+    ) VALUES (
+        p_codice_prenotazione, 
+        p_id_proiezione, 
+        v_num_sala, 
+        p_fila, 
+        p_numero_posto,
+        'TEMPORANEA',
+        NOW(),
+        DATE_ADD(NOW(), INTERVAL 10 MINUTE)
+    );
+
+    --log operazione
+    INSERT INTO log_operazioni (operazione, codice_prenotazione, id_proiezione, dettagli)
+    VALUES ('PRENOTAZIONE_CREATA', p_codice_prenotazione, p_id_proiezione, JSON_OBJECT('posto', CONCAT(p_fila, p_numero_posto), 'prezzo', v_prezzo));
+    SET p_risultato = 1; -- Successo
+    COMMIT;
+    
+    proc_exit: BEGIN END;
+END //
