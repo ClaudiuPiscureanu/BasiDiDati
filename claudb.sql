@@ -100,7 +100,7 @@ CREATE TABLE prenotazione(
     timestamp_scadenza DATETIME NOT NULL, -- Calcolato: creazione + 10 minuti
     PRIMARY KEY(codice_prenotazione),
     FOREIGN KEY (id_proiezione) REFERENCES proiezione(id_proiezione),
-    FOREIGN KEY (num_sala, fila, numero_posto) REFERENCES posto(num_sala, fila, numero_posto),
+    FOREIGN KEY (num_sala, fila, numero_posto) REFERENCES posto(num_sala, fila, num_posto),
     UNIQUE KEY uk_proiezione_posto (id_proiezione, num_sala, fila, numero_posto),
     INDEX idx_stato_scadenza (stato_prenotazione, timestamp_scadenza),
     INDEX idx_proiezione (id_proiezione),
@@ -177,7 +177,7 @@ CREATE PROCEDURE CreaPrenotazioneTemporanea(
     OUT p_codice_prenotazione VARCHAR(20),
     OUT p_risultato INT -- 1=successo, 0=posto occupato, -1=errore_proiezione, -2=errore_generico 
 )
-BEGIN
+proc_exit: BEGIN
     DECLARE v_num_sala TINYINT UNSIGNED;
     DECLARE v_data_inizio DATETIME;
     DECLARE v_prezzo DECIMAL(5,2);
@@ -205,7 +205,7 @@ BEGIN
     -- Inizia la transazione
     START TRANSACTION;
 
-    --verifica che la proiezione esista e recupera i dati necessari
+    -- verifica che la proiezione esista e recupera i dati necessari
     SELECT num_sala, data_ora_inizio, prezzo
     INTO v_num_sala, v_data_inizio, v_prezzo
     FROM proiezione 
@@ -218,16 +218,16 @@ BEGIN
         LEAVE proc_exit;
     END IF;
 
-    --creo lock specifico per prosto e proiezione 
+    -- creo lock specifico per prosto e proiezione 
     SET v_lock_name = CONCAT('seat_',p_id_proiezione, '_', v_num_sala, '_', p_fila, '_', p_numero_posto);
     
-    --acquisisce lock distribuito con timeout 
+    -- acquisisce lock distribuito con timeout
     INSERT INTO distributed_locks (lock_name, expires_at, session_id) 
-    VALUES (v_lock_name, DATA_ADD(NOW(), INTERVAL 15 MINUTE), v_session_id)
-    ON DUPLICATE KEY UPDATE lock_name = lock_name, --falisce se lock gia essiste 
+    VALUES (v_lock_name, DATE_ADD(NOW(), INTERVAL 15 MINUTE), v_session_id)
+    ON DUPLICATE KEY UPDATE lock_name = lock_name; -- falisce se lock gia essiste 
 
     IF ROW_COUNT() = 0 THEN
-        SET p_risultato = 0; --posto in fase di prenotazione da parte di unaltro utente
+        SET p_risultato = 0; -- posto in fase di prenotazione da parte di unaltro utente
         ROLLBACK;
         LEAVE proc_exit;
     END IF;
@@ -242,7 +242,7 @@ BEGIN
         AND stato_prenotazione IN ('TEMPORANEA', 'CONFERMATA');
     IF v_count_existing > 0 THEN
         SET p_risultato = 0; -- Posto già prenotato
-        DELETE from distribuited_locks WHERE lock_name = v_lock_name AND session_id = v_session_id;
+        DELETE from distributed_locks WHERE lock_name = v_lock_name AND session_id = v_session_id;
         ROLLBACK;
         LEAVE proc_exit;
     END IF;
@@ -280,11 +280,176 @@ BEGIN
         DATE_ADD(NOW(), INTERVAL 10 MINUTE)
     );
 
-    --log operazione
+    -- log operazione
     INSERT INTO log_operazioni (operazione, codice_prenotazione, id_proiezione, dettagli)
     VALUES ('PRENOTAZIONE_CREATA', p_codice_prenotazione, p_id_proiezione, JSON_OBJECT('posto', CONCAT(p_fila, p_numero_posto), 'prezzo', v_prezzo));
     SET p_risultato = 1; -- Successo
     COMMIT;
     
-    proc_exit: BEGIN END;
 END //
+-- =============================================
+-- PROCEDURA: Conferma Prenotazione
+-- Gestisce il pagamento e la conferma finale
+-- =============================================
+CREATE PROCEDURE ConfermaPrenotazione(
+    IN p_codice_prenotazione VARCHAR(20),
+    IN p_ticket_pag VARCHAR(50),
+    OUT p_risultato INT -- 1=successo, 0=prenotazione non trovata, -1=scaduta, -2=errore_generico
+)
+proc_exit: BEGIN 
+    DECLARE v_stato_attuale ENUM('TEMPORANEA', 'CONFERMATA', 'ANNULLATA', 'SCADUTA');
+    DECLARE v_timestamp_scadenza DATETIME;
+    DECLARE v_id_proiezione SMALLINT UNSIGNED;
+    DECLARE v_lock_name VARCHAR(100);
+    DECLARE v_num_sala TINYINT UNSIGNED;
+    DECLARE v_fila CHAR(1);
+    DECLARE v_numero_posto TINYINT UNSIGNED;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN 
+        ROLLBACK;
+        SET p_risultato = -2; -- Errore generico
+    END;
+
+    START TRANSACTION;
+    
+    -- Acquisisce lock esclusivo sulla prenotazione
+    SELECT stato_prenotazione, timestamp_scadenza, id_proiezione, num_sala, fila, numero_posto
+    INTO v_stato_attuale, v_timestamp_scadenza, v_id_proiezione, v_num_sala, v_fila, v_numero_posto
+    FROM prenotazione
+    WHERE codice_prenotazione = p_codice_prenotazione
+    FOR UPDATE;
+
+    IF v_stato_attuale IS NULL THEN
+        SET p_risultato = 0; -- Prenotazione non trovata
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+
+    -- Verifica che sia ancora temporanea e non scaduta
+    IF v_stato_attuale != 'TEMPORANEA' THEN
+        SET p_risultato = -1; 
+        ROLLBACK;
+        LEAVE proc_exit;    
+    END IF;
+
+    IF NOW() > v_timestamp_scadenza THEN
+        UPDATE prenotazione  -- Marca come scaduta
+        SET stato_prenotazione = 'SCADUTA'
+        WHERE codice_prenotazione = p_codice_prenotazione;
+        SET p_risultato = -1; -- Prenotazione scaduta
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+
+    -- Conferma la prenotazione
+    UPDATE prenotazione
+    SET stato_prenotazione = 'CONFERMATA',
+        timestamp_conferma = NOW(),
+        ticket_pag = p_ticket_pag
+        WHERE codice_prenotazione = p_codice_prenotazione;  
+    
+    -- rimuove il lock distribuito
+    SET v_lock_name = CONCAT('seat_', v_id_proiezione, '_', v_num_sala, '_', v_fila, '_', v_numero_posto);
+    DELETE FROM distributed_locks 
+    WHERE lock_name = v_lock_name;
+
+    -- log operazione
+    INSERT INTO log_operazioni (operazione, codice_prenotazione, id_proiezione, dettagli)
+        VALUES ('PRENOTAZIONE_CONFERMATA', p_codice_prenotazione, v_id_proiezione, JSON_OBJECT('posto', CONCAT(v_fila, v_numero_posto), 'prezzo', v_prezzo)); -- probabilmente devo togliere prezzo
+        
+    SET p_risultato = 1; -- Successo
+    COMMIT;
+END //
+
+-- =============================================    
+-- PROCEDURA: Annulla Prenotazione
+-- Gestisce l'annullamento di una prenotazione fino a 30 minuti prima
+-- =============================================
+
+CREATE PROCEDURE AnnullaPrenotazione(
+    IN p_codice_prenotazione VARCHAR(20),
+    OUT p_risultato INT -- 1=successo, 0=prenotazione non trovata, -1=troppo tardi, -2=errore_generico
+)
+proc_exit: BEGIN
+    DECLARE v_stato_attuale ENUM('TEMPORANEA', 'CONFERMATA', 'ANNULLATA', 'SCADUTA');
+    DECLARE v_data_inizio DATETIME;
+    DECLARE v_id_proiezione SMALLINT UNSIGNED;
+
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SET p_risultato = -2; -- Errore generico
+    END;
+
+    START TRANSACTION;
+
+    -- Verifica prenotazione e orario proiezione
+    SELECT p.stato_prenotazione, pr.data_ora_inizio, p.id_proiezione
+    INTO v_stato_attuale, v_data_inizio, v_id_proiezione
+    FROM prenotazione p
+    JOIN proiezione pr ON p.id_proiezione = pr.id_proiezione
+    WHERE p.codice_prenotazione = p_codice_prenotazione
+    FOR UPDATE;
+
+    IF v_stato_attuale IS NULL THEN
+        SET p_risultato = 0; -- Prenotazione non trovata
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+
+    -- Verifica timing (30 minuti prima)
+    IF NOW() > DATE_SUB(v_data_inizio, INTERVAL 30 MINUTE) THEN
+        SET p_risultato = -1; -- Troppo tardi per annullare
+        ROLLBACK;
+        LEAVE proc_exit;
+    END IF;
+
+    -- Annulla la prenotazione 
+    IF v_stato_attuale = ('TEMPORANEA' , 'CONFERMATA') THEN
+        UPDATE prenotazione
+        SET stato_prenotazione = 'ANNULLATA'
+        WHERE codice_prenotazione = p_codice_prenotazione;
+
+        -- log operazione
+        INSERT INTO log_operazioni (operazione, codice_prenotazione, id_proiezione)
+        VALUES ('PRENOTAZIONE_ANNULLATA', p_codice_prenotazione, v_id_proiezione);
+       END IF;
+
+        SET p_risultato = 1; -- Successo
+        COMMIT;
+END //
+
+-- =============================================
+-- PROCEDURA: Cleanup Prenotazioni Scadute
+-- Eseguita periodicamente per pulizia
+-- =============================================
+
+CREATE PROCEDURE CleanupPrenotazioniScadute()
+proc_exit: BEGIN
+    DECLARE v_count INT DEFAULT 0;
+
+    START TRANSACTION;
+    -- Marca come scadute le prenotazioni temporanee scadute
+    UPDATE prenotazione
+    SET stato_prenotazione = 'SCADUTA'
+    WHERE stato_prenotazione = 'TEMPORANEA' 
+        AND timestamp_scadenza < NOW();
+
+    SET v_count = ROW_COUNT();
+
+    -- Log delle prenotazioni scadute
+    IF v_count > 0 THEN
+        INSERT INTO log_operazioni (operazione, id_proiezione, dettagli)
+        VALUES ('PRENOTAZIONE_SCADUTA', NULL, JSON_OBJECT('count', v_count));
+    END IF;
+    
+    -- rimuove lock scaduti
+    DELETE FROM distributed_locks 
+    WHERE expires_at < NOW();
+
+    COMMIT;
+
+END //
+
+DELIMITER ;
