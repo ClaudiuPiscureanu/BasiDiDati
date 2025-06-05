@@ -356,7 +356,7 @@ proc_exit: BEGIN
 
     -- log operazione
     INSERT INTO log_operazioni (operazione, codice_prenotazione, id_proiezione, dettagli)
-        VALUES ('PRENOTAZIONE_CONFERMATA', p_codice_prenotazione, v_id_proiezione, JSON_OBJECT('posto', CONCAT(v_fila, v_num_posto), 'prezzo', v_prezzo)); -- probabilmente devo togliere prezzo
+        VALUES ('PRENOTAZIONE_CONFERMATA', p_codice_prenotazione, v_id_proiezione, JSON_OBJECT('posto', CONCAT(v_fila, v_num_posto)));
         
     SET p_risultato = 1; -- Successo
     COMMIT;
@@ -547,7 +547,7 @@ BEGIN
             JSON_OBJECT(
                 'stato_precedente', OLD.stato_prenotazione,
                 'stato_nuovo', NEW.stato_prenotazione,
-                'posto', CONCAT(NEW.fila, NEW.numero_posto)
+                'posto', CONCAT(NEW.fila, NEW.num_posto)
             )
         );
     END IF;
