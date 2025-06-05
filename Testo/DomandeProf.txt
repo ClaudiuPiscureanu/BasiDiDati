@@ -15,3 +15,7 @@ domande:
 
 
 abbiamo due stati_ {confermato, annulato}
+
+
+        <sonar.organization>claudiupiscureanu</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>

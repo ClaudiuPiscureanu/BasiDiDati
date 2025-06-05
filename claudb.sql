@@ -178,6 +178,9 @@ CREATE PROCEDURE CreaPrenotazioneTemporanea(
     OUT p_risultato INT -- 1=successo, 0=posto occupato, -1=errore_proiezione, -2=errore_generico 
 )
 proc_exit: BEGIN
+
+    -- SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE
+
     DECLARE v_num_sala TINYINT UNSIGNED;
     DECLARE v_data_inizio DATETIME;
     DECLARE v_prezzo DECIMAL(5,2);
