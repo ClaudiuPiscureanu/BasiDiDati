@@ -1,7 +1,7 @@
 -- ================================================================
 -- File: configurazione_claudb.sql
 -- Scopo: Configurazione del database per la gestione di sale cinematografiche 
--- Corso di basi di dati ad ingengeria tor vergata :)
+-- Corso di basi di dati a ingegneria tor vergata :)
 -- ================================================================
 
 
@@ -21,7 +21,7 @@ USE claudb;
 
 CREATE TABLE cinema(
     nome_cinema VARCHAR(45) NOT NULL,
-    indirizzo VARCHAR(50)  NOT NULL, -- dato che non e' un dato essenziale utiliziamo semplicemente una stringa, sara' compito dell'applicazione struttutare la formattazione
+    indirizzo VARCHAR(50)  NOT NULL, -- dato che non e un dato essenziale utilizziamo semplicemente una stringa, sara' compito dell'applicazione strutturare la formattazione
     orario_apertura TIME NOT NULL,
     PRIMARY KEY  (nome_cinema)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -218,16 +218,16 @@ proc_exit: BEGIN
         LEAVE proc_exit;
     END IF;
 
-    -- creo lock specifico per prosto e proiezione 
+    -- creo lock specifico per posto e proiezione
     SET v_lock_name = CONCAT('seat_',p_id_proiezione, '_', v_num_sala, '_', p_fila, '_', p_num_posto);
     
     -- acquisisce lock distribuito con timeout
     INSERT INTO distributed_locks (lock_name, expires_at, session_id) 
     VALUES (v_lock_name, DATE_ADD(NOW(), INTERVAL 15 MINUTE), v_session_id)
-    ON DUPLICATE KEY UPDATE lock_name = lock_name; -- falisce se lock gia essiste 
+    ON DUPLICATE KEY UPDATE lock_name = lock_name; -- fallisce se lock gia esiste
 
     IF ROW_COUNT() = 0 THEN
-        SET p_risultato = 0; -- posto in fase di prenotazione da parte di unaltro utente
+        SET p_risultato = 0; -- posto in fase di prenotazione da parte di un altro utente
         ROLLBACK;
         LEAVE proc_exit;
     END IF;
@@ -452,7 +452,7 @@ proc_exit: BEGIN
 
 END //
 
-DELIMITER ;
+
 
 
 -- =============================================
