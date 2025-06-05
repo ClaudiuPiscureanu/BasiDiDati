@@ -1,0 +1,377 @@
+-- =============================================
+-- TRIGGER PER SISTEMA CINEMA
+-- =============================================
+
+DELIMITER //
+
+-- =============================================
+-- TRIGGER: Calcolo automatico data fine proiezione
+-- =============================================
+CREATE TRIGGER calcola_data_fine_proiezione
+    BEFORE INSERT ON proiezione
+    FOR EACH ROW
+BEGIN
+    DECLARE v_durata_minuti SMALLINT UNSIGNED;
+    
+    -- Recupera durata film
+    SELECT durata_minuti INTO v_durata_minuti
+    FROM film 
+    WHERE titolo_film = NEW.titolo_film;
+    
+    -- Calcola data fine aggiungendo durata + 15 minuti buffer
+    IF v_durata_minuti IS NOT NULL THEN
+        SET NEW.data_ora_fine = DATE_ADD(NEW.data_ora_inizio, INTERVAL (v_durata_minuti + 15) MINUTE);
+    END IF;
+END //
+
+-- =============================================
+-- TRIGGER: Validazione sovrapposizione proiezioni
+-- Impedisce scheduling di film nella stessa sala in orari sovrapposti
+-- =============================================
+CREATE TRIGGER valida_sovrapposizione_proiezioni
+    BEFORE INSERT ON proiezione
+    FOR EACH ROW
+BEGIN
+    DECLARE v_count_overlap INT DEFAULT 0;
+    DECLARE v_error_msg VARCHAR(255);
+    
+    -- Verifica sovrapposizioni nella stessa sala
+    SELECT COUNT(*) INTO v_count_overlap
+    FROM proiezione p
+    WHERE p.num_sala = NEW.num_sala
+      AND p.stato_proiezione IN ('PROGRAMMATA', 'IN_CORSO')
+      AND (
+          -- Nuova proiezione inizia durante una esistente
+          (NEW.data_ora_inizio BETWEEN p.data_ora_inizio AND p.data_ora_fine)
+          OR
+          -- Nuova proiezione finisce durante una esistente  
+          (NEW.data_ora_fine BETWEEN p.data_ora_inizio AND p.data_ora_fine)
+          OR
+          -- Nuova proiezione contiene completamente una esistente
+          (NEW.data_ora_inizio <= p.data_ora_inizio AND NEW.data_ora_fine >= p.data_ora_fine)
+      );
+    
+    IF v_count_overlap > 0 THEN
+        SET v_error_msg = CONCAT('Sovrapposizione proiezioni nella sala ', NEW.num_sala, 
+                                ' per orario ', NEW.data_ora_inizio);
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_msg;
+    END IF;
+END //
+
+-- =============================================
+-- TRIGGER: Log automatico cambi stato prenotazione
+-- =============================================
+CREATE TRIGGER log_cambio_stato_prenotazione
+    AFTER UPDATE ON prenotazione
+    FOR EACH ROW
+BEGIN
+    IF OLD.stato_prenotazione != NEW.stato_prenotazione THEN
+        INSERT INTO log_operazioni (
+            operazione, 
+            codice_prenotazione, 
+            id_proiezione, 
+            dettagli
+        ) VALUES (
+            CASE NEW.stato_prenotazione
+                WHEN 'CONFERMATA' THEN 'PRENOTAZIONE_CONFERMATA'
+                WHEN 'ANNULLATA' THEN 'PRENOTAZIONE_ANNULLATA'
+                WHEN 'SCADUTA' THEN 'PRENOTAZIONE_SCADUTA'
+                ELSE 'CAMBIO_STATO'
+            END,
+            NEW.codice_prenotazione,
+            NEW.id_proiezione,
+            JSON_OBJECT(
+                'stato_precedente', OLD.stato_prenotazione,
+                'stato_nuovo', NEW.stato_prenotazione,
+                'posto', CONCAT(NEW.fila, NEW.numero_posto)
+            )
+        );
+    END IF;
+END //
+
+-- =============================================
+-- TRIGGER: Cleanup automatico lock alla conferma
+-- =============================================
+CREATE TRIGGER cleanup_lock_conferma
+    AFTER UPDATE ON prenotazione
+    FOR EACH ROW
+BEGIN
+    DECLARE v_lock_name VARCHAR(100);
+    
+    -- Rimuove lock quando prenotazione viene confermata
+    IF OLD.stato_prenotazione = 'TEMPORANEA' AND NEW.stato_prenotazione = 'CONFERMATA' THEN
+        SET v_lock_name = CONCAT('seat_', NEW.id_proiezione, '_', NEW.num_sala, '_', NEW.fila, '_', NEW.numero_posto);
+        DELETE FROM distributed_locks WHERE lock_name = v_lock_name;
+    END IF;
+    
+    -- Rimuove lock anche quando prenotazione viene annullata o scade
+    IF OLD.stato_prenotazione = 'TEMPORANEA' AND NEW.stato_prenotazione IN ('ANNULLATA', 'SCADUTA') THEN
+        SET v_lock_name = CONCAT('seat_', NEW.id_proiezione, '_', NEW.num_sala, '_', NEW.fila, '_', NEW.numero_posto);
+        DELETE FROM distributed_locks WHERE lock_name = v_lock_name;
+    END IF;
+END //
+
+-- =============================================
+-- TRIGGER: Aggiornamento automatico stato proiezioni
+-- =============================================
+CREATE TRIGGER aggiorna_stato_proiezione
+    BEFORE UPDATE ON proiezione
+    FOR EACH ROW
+BEGIN
+    -- Aggiorna stato basandosi sull'orario corrente
+    IF NOW() >= NEW.data_ora_inizio AND NOW() < NEW.data_ora_fine THEN
+        SET NEW.stato_proiezione = 'IN_CORSO';
+    ELSEIF NOW() >= NEW.data_ora_fine THEN
+        SET NEW.stato_proiezione = 'TERMINATA';
+    END IF;
+END //
+
+DELIMITER ;
+
+-- =============================================
+-- STORED PROCEDURE AGGIUNTIVE
+-- =============================================
+
+DELIMITER //
+
+-- =============================================
+-- PROCEDURA: Inizializza posti per una sala
+-- =============================================
+CREATE PROCEDURE InizializzaPostiSala(
+    IN p_num_sala TINYINT UNSIGNED,
+    IN p_max_fila CHAR(1),
+    IN p_posti_per_fila TINYINT UNSIGNED
+)
+BEGIN
+    DECLARE v_fila_ascii INT;
+    DECLARE v_max_fila_ascii INT;
+    DECLARE v_numero_posto INT;
+    
+    SET v_fila_ascii = ASCII(p_max_fila);
+    SET v_max_fila_ascii = ASCII('A');
+    
+    -- Loop per ogni fila (da A alla fila massima)
+    WHILE v_max_fila_ascii <= v_fila_ascii DO
+        SET v_numero_posto = 1;
+        
+        -- Loop per ogni posto nella fila
+        WHILE v_numero_posto <= p_posti_per_fila DO
+            INSERT IGNORE INTO posto (num_sala, fila, numero_posto)
+            VALUES (p_num_sala, CHAR(v_max_fila_ascii), v_numero_posto);
+            
+            SET v_numero_posto = v_numero_posto + 1;
+        END WHILE;
+        
+        SET v_max_fila_ascii = v_max_fila_ascii + 1;
+    END WHILE;
+    
+    -- Aggiorna capacità totale sala
+    UPDATE sala 
+    SET capacita_totale = (SELECT COUNT(*) FROM posto WHERE num_sala = p_num_sala)
+    WHERE num_sala = p_num_sala;
+END //
+
+-- =============================================
+-- PROCEDURA: Report incassi per periodo
+-- =============================================
+CREATE PROCEDURE ReportIncassiPeriodo(
+    IN p_data_inizio DATE,
+    IN p_data_fine DATE
+)
+BEGIN
+    SELECT 
+        pr.num_sala,
+        s.nome_sala,
+        pr.titolo_film,
+        COUNT(res.codice_prenotazione) as prenotazioni_totali,
+        COUNT(CASE WHEN res.stato_prenotazione = 'CONFERMATA' THEN 1 END) as prenotazioni_confermate,
+        COUNT(CASE WHEN res.stato_prenotazione = 'ANNULLATA' THEN 1 END) as prenotazioni_annullate,
+        SUM(CASE WHEN res.stato_prenotazione = 'CONFERMATA' THEN pr.prezzo ELSE 0 END) as incasso_totale,
+        ROUND(AVG(pr.prezzo), 2) as prezzo_medio,
+        ROUND(
+            COUNT(CASE WHEN res.stato_prenotazione = 'CONFERMATA' THEN 1 END) * 100.0 / 
+            COUNT(res.codice_prenotazione), 2
+        ) as percentuale_confermate
+    FROM proiezione pr
+    LEFT JOIN prenotazione res ON pr.id_proiezione = res.id_proiezione
+    LEFT JOIN sala s ON pr.num_sala = s.num_sala
+    WHERE DATE(pr.data_ora_inizio) BETWEEN p_data_inizio AND p_data_fine
+      AND res.codice_prenotazione IS NOT NULL
+    GROUP BY pr.num_sala, s.nome_sala, pr.titolo_film
+    ORDER BY incasso_totale DESC;
+END //
+
+-- =============================================
+-- PROCEDURA: Statistiche occupazione sale
+-- =============================================
+CREATE PROCEDURE StatisticheOccupazioneSale(
+    IN p_data_inizio DATE,
+    IN p_data_fine DATE
+)
+BEGIN
+    SELECT 
+        s.num_sala,
+        s.nome_sala,
+        s.capacita_totale,
+        COUNT(DISTINCT pr.id_proiezione) as numero_proiezioni,
+        COUNT(res.codice_prenotazione) as posti_prenotati,
+        COUNT(CASE WHEN res.stato_prenotazione = 'CONFERMATA' THEN 1 END) as posti_venduti,
+        ROUND(
+            COUNT(CASE WHEN res.stato_prenotazione = 'CONFERMATA' THEN 1 END) * 100.0 / 
+            (s.capacita_totale * COUNT(DISTINCT pr.id_proiezione)), 2
+        ) as percentuale_occupazione,
+        SUM(CASE WHEN res.stato_prenotazione = 'CONFERMATA' THEN pr.prezzo ELSE 0 END) as ricavo_totale
+    FROM sala s
+    LEFT JOIN proiezione pr ON s.num_sala = pr.num_sala 
+        AND DATE(pr.data_ora_inizio) BETWEEN p_data_inizio AND p_data_fine
+    LEFT JOIN prenotazione res ON pr.id_proiezione = res.id_proiezione
+    GROUP BY s.num_sala, s.nome_sala, s.capacita_totale
+    ORDER BY percentuale_occupazione DESC;
+END //
+
+-- =============================================
+-- PROCEDURA: Recovery dopo blackout
+-- Ripristina stato coerente del sistema
+-- =============================================
+CREATE PROCEDURE RecoveryDopoBlackout()
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_codice VARCHAR(20);
+    DECLARE v_timestamp_scadenza DATETIME;
+    
+    DECLARE cur_temp_scadute CURSOR FOR
+        SELECT codice_prenotazione, timestamp_scadenza
+        FROM prenotazione 
+        WHERE stato_prenotazione = 'TEMPORANEA' 
+          AND timestamp_scadenza < NOW();
+    
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    START TRANSACTION;
+    
+    -- 1. Marca come scadute le prenotazioni temporanee scadute
+    UPDATE prenotazione 
+    SET stato_prenotazione = 'SCADUTA'
+    WHERE stato_prenotazione = 'TEMPORANEA' 
+      AND timestamp_scadenza < NOW();
+    
+    -- 2. Rimuove tutti i lock scaduti
+    DELETE FROM distributed_locks WHERE expires_at < NOW();
+    
+    -- 3. Aggiorna stati proiezioni
+    UPDATE proiezione 
+    SET stato_proiezione = 'IN_CORSO'
+    WHERE NOW() >= data_ora_inizio 
+      AND NOW() < data_ora_fine
+      AND stato_proiezione = 'PROGRAMMATA';
+    
+    UPDATE proiezione 
+    SET stato_proiezione = 'TERMINATA'
+    WHERE NOW() >= data_ora_fine
+      AND stato_proiezione IN ('PROGRAMMATA', 'IN_CORSO');
+    
+    -- 4. Log dell'operazione di recovery
+    INSERT INTO log_operazioni (operazione, dettagli)
+    VALUES ('RECOVERY_BLACKOUT', JSON_OBJECT(
+        'timestamp_recovery', NOW(),
+        'prenotazioni_scadute', (SELECT ROW_COUNT())
+    ));
+    
+    COMMIT;
+    
+    -- 5. Restituisce statistiche recovery
+    SELECT 
+        'Recovery completato' as stato,
+        (SELECT COUNT(*) FROM prenotazione WHERE stato_prenotazione = 'SCADUTA' 
+         AND timestamp_creazione >= DATE_SUB(NOW(), INTERVAL 1 HOUR)) as prenotazioni_scadute,
+        (SELECT COUNT(*) FROM distributed_locks) as lock_attivi_rimanenti,
+        (SELECT COUNT(*) FROM proiezione WHERE stato_proiezione = 'TERMINATA' 
+         AND data_ora_fine >= DATE_SUB(NOW(), INTERVAL 1 HOUR)) as proiezioni_terminate;
+END //
+
+DELIMITER ;
+
+-- =============================================
+-- VISTE AGGIUNTIVE PER MONITORING
+-- =============================================
+
+-- Vista per monitoring sistema in tempo reale
+CREATE VIEW vista_monitoring_sistema AS
+SELECT
+    'prenotazioni_attive' as metrica,
+    COUNT(*) as valore
+FROM prenotazione 
+WHERE stato_prenotazione IN ('TEMPORANEA', 'CONFERMATA')
+
+UNION ALL
+
+SELECT
+    'lock_attivi' as metrica,
+    COUNT(*) as valore
+FROM distributed_locks
+WHERE expires_at > NOW()
+
+UNION ALL
+
+SELECT
+    'proiezioni_oggi' as metrica,
+    COUNT(*) as valore
+FROM proiezione
+WHERE DATE(data_ora_inizio) = CURDATE()
+
+UNION ALL
+
+SELECT
+    'incasso_oggi' as metrica,
+    COALESCE(SUM(pr.prezzo), 0) as valore
+FROM prenotazione p
+JOIN proiezione pr ON p.id_proiezione = pr.id_proiezione
+WHERE p.stato_prenotazione = 'CONFERMATA'
+  AND DATE(p.timestamp_conferma) = CURDATE();
+
+-- Vista per rilevamento anomalie
+CREATE VIEW vista_anomalie AS
+SELECT 
+    'prenotazioni_temporanee_vecchie' as tipo_anomalia,
+    COUNT(*) as count_anomalie,
+    GROUP_CONCAT(codice_prenotazione) as dettagli
+FROM prenotazione 
+WHERE stato_prenotazione = 'TEMPORANEA' 
+  AND timestamp_scadenza < DATE_SUB(NOW(), INTERVAL 1 HOUR)
+
+UNION ALL
+
+SELECT 
+    'lock_scaduti_non_rimossi' as tipo_anomalia,
+    COUNT(*) as count_anomalie,
+    GROUP_CONCAT(lock_name) as dettagli
+FROM distributed_locks 
+WHERE expires_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+
+UNION ALL
+
+SELECT 
+    'proiezioni_senza_prenotazioni' as tipo_anomalia,
+    COUNT(*) as count_anomalie,
+    GROUP_CONCAT(CAST(id_proiezione AS CHAR)) as dettagli
+FROM proiezione pr
+WHERE pr.data_ora_inizio > NOW()
+  AND pr.data_ora_inizio < DATE_ADD(NOW(), INTERVAL 24 HOUR)
+  AND NOT EXISTS (
+      SELECT 1 FROM prenotazione p 
+      WHERE p.id_proiezione = pr.id_proiezione 
+        AND p.stato_prenotazione IN ('TEMPORANEA', 'CONFERMATA')
+  );
+
+-- =============================================
+-- EVENTO PER RECOVERY AUTOMATICO
+-- Esegue recovery ogni ora
+-- =============================================
+CREATE EVENT IF NOT EXISTS recovery_automatico
+ON SCHEDULE EVERY 1 HOUR
+STARTS CURRENT_TIMESTAMP
+DO
+  CALL RecoveryDopoBlackout();
+
+-- Abilita il sistema di eventi
+SET GLOBAL event_scheduler = ON;

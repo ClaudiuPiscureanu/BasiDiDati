@@ -73,7 +73,7 @@ CREATE TABLE proiezione(
     prezzo DECIMAL(5,2) NOT NULL,
     data_ora_inizio DATETIME NOT NULL,
     data_ora_fine DATETIME NOT NULL, -- AGGIUNTO per calcoli
-        stato_proiezione ENUM('PROGRAMMATA', 'IN_CORSO', 'TERMINATA') DEFAULT 'PROGRAMMATA',
+    stato_proiezione ENUM('PROGRAMMATA', 'IN_CORSO', 'TERMINATA') DEFAULT 'PROGRAMMATA',
     PRIMARY KEY(id_proiezione),
     FOREIGN KEY (titolo_film) REFERENCES film(titolo_film) ON DELETE CASCADE,
     FOREIGN KEY (num_sala) REFERENCES sala(num_sala) ON DELETE CASCADE,
@@ -519,3 +519,72 @@ GROUP BY pr.num_sala, s.nome_sala, YEAR(res.timestamp_creazione), MONTH(res.time
 
 -- Abilita eventi programmati
 SET GLOBAL event_scheduler = ON;
+
+-- =============================================
+-- TRIGGER PER SISTEMA CINEMA
+-- =============================================
+
+-- TRIGGER: Log automatico cambi stato prenotazione
+CREATE TRIGGER log_cambio_stato_prenotazione
+    AFTER UPDATE ON prenotazione
+    FOR EACH ROW
+BEGIN
+    IF OLD.stato_prenotazione != NEW.stato_prenotazione THEN
+        INSERT INTO log_operazioni (
+            operazione, 
+            codice_prenotazione, 
+            id_proiezione, 
+            dettagli
+        ) VALUES (
+            CASE NEW.stato_prenotazione
+                WHEN 'CONFERMATA' THEN 'PRENOTAZIONE_CONFERMATA'
+                WHEN 'ANNULLATA' THEN 'PRENOTAZIONE_ANNULLATA'
+                WHEN 'SCADUTA' THEN 'PRENOTAZIONE_SCADUTA'
+                ELSE 'CAMBIO_STATO'
+            END,
+            NEW.codice_prenotazione,
+            NEW.id_proiezione,
+            JSON_OBJECT(
+                'stato_precedente', OLD.stato_prenotazione,
+                'stato_nuovo', NEW.stato_prenotazione,
+                'posto', CONCAT(NEW.fila, NEW.numero_posto)
+            )
+        );
+    END IF;
+END //
+
+-- TRIGGER: Cleanup automatico lock alla conferma
+CREATE TRIGGER cleanup_lock_conferma
+    AFTER UPDATE ON prenotazione
+    FOR EACH ROW
+BEGIN
+    DECLARE v_lock_name VARCHAR(100);
+    
+    -- Rimuove lock quando prenotazione viene confermata
+    IF OLD.stato_prenotazione = 'TEMPORANEA' AND NEW.stato_prenotazione = 'CONFERMATA' THEN
+        SET v_lock_name = CONCAT('seat_', NEW.id_proiezione, '_', NEW.num_sala, '_', NEW.fila, '_', NEW.num_posto);
+        DELETE FROM distributed_locks WHERE lock_name = v_lock_name;
+    END IF;
+    
+    -- Rimuove lock anche quando prenotazione viene annullata o scade
+    IF OLD.stato_prenotazione = 'TEMPORANEA' AND NEW.stato_prenotazione IN ('ANNULLATA', 'SCADUTA') THEN
+        SET v_lock_name = CONCAT('seat_', NEW.id_proiezione, '_', NEW.num_sala, '_', NEW.fila, '_', NEW.num_posto);
+        DELETE FROM distributed_locks WHERE lock_name = v_lock_name;
+    END IF;
+END //
+
+
+-- TRIGGER: Aggiornamento automatico stato proiezioni
+CREATE TRIGGER aggiorna_stato_proiezione
+    BEFORE UPDATE ON proiezione
+    FOR EACH ROW
+BEGIN
+    -- Aggiorna stato basandosi sull'orario corrente
+    IF NOW() >= NEW.data_ora_inizio AND NOW() < NEW.data_ora_fine THEN
+        SET NEW.stato_proiezione = 'IN_CORSO';
+    ELSEIF NOW() >= NEW.data_ora_fine THEN
+        SET NEW.stato_proiezione = 'TERMINATA';
+    END IF;
+END //
+
+DELIMITER ;
