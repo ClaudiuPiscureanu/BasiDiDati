@@ -40,10 +40,10 @@ public class Film {
     }
 
     public Film(){}
-    public Film(String titoloFilm, byte durataMinuti, String casaCinematografica) {
-        this(titoloFilm, durataMinuti);
-        this.casaCinematografica = casaCinematografica;
-    }
+//    public Film(String titoloFilm, byte durataMinuti, String casaCinematografica) {
+//        this(titoloFilm, durataMinuti);
+//        this.casaCinematografica = casaCinematografica;
+//    }
     // Getters e Setters
     public String getTitoloFilm() { return titoloFilm; }
     public void setTitoloFilm(String titoloFilm) { this.titoloFilm = titoloFilm; }

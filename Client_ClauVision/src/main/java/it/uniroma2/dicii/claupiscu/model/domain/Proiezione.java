@@ -15,6 +15,7 @@ public class Proiezione {
     private byte numSala;
     private BigDecimal prezzo;
     private LocalDateTime dataOraInizio;
+    private byte DurataMinuti;
     private LocalDateTime dataOraFine;
     private StatoProiezione statoProiezione;
 
@@ -44,8 +45,19 @@ public class Proiezione {
     public byte getNumSala() { return numSala; }
     public void setNumSala(byte numSala) { this.numSala = numSala; }
 
+    public String getNomeSala() {
+        return this.sala != null ? this.sala.getNomeSala() : "Sala " + numSala;
+    }
     public BigDecimal getPrezzo() { return prezzo; }
     public void setPrezzo(BigDecimal prezzo) { this.prezzo = prezzo; }
+
+    public int getDurataMinuti() {
+        return Byte.toUnsignedInt(DurataMinuti);
+    }
+
+    public void setDurataMinuti(byte durataMinuti) {
+        DurataMinuti = durataMinuti;
+    }
 
     public LocalDateTime getDataOraInizio() { return dataOraInizio; }
     public void setDataOraInizio(LocalDateTime dataOraInizio) { this.dataOraInizio = dataOraInizio; }
