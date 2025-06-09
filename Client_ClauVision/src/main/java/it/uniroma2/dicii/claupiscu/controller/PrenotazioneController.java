@@ -1,206 +1,217 @@
 package it.uniroma2.dicii.claupiscu.controller;
-import it.uniroma2.dicii.claupiscu.model.dao.FilmDao;
-import it.uniroma2.dicii.claupiscu.model.dao.PostoDao;
+
 import it.uniroma2.dicii.claupiscu.model.dao.PrenotazioneDao;
 import it.uniroma2.dicii.claupiscu.model.dao.ProiezioneDao;
-import it.uniroma2.dicii.claupiscu.model.domain.Film;
-import it.uniroma2.dicii.claupiscu.model.domain.Posto;
+import it.uniroma2.dicii.claupiscu.model.domain.Prenotazione;
+import it.uniroma2.dicii.claupiscu.model.domain.Proiezione;
 import it.uniroma2.dicii.claupiscu.view.PrenotazioneView;
-import java.util.Scanner;
 
-//public class PrenotazioneController implements Controller{
-//    @Override
-//    public void start() {
-//        System.out.println("PrenotazioneController started!");
-//    }
-//
-//
-//}
-public class PrenotazioneController implements Controller {
-    private ProiezioneDao proiezioneDAO;
-    private FilmDao filmDAO;
-    private PostoDao postoDAO;
-    private PrenotazioneDao prenotazioneDAO;
-    private PrenotazioneView view;
-    private Scanner scanner;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.UUID;
 
-    @Override
-    public void start() {
+public class PrenotazioneController {
+    private PrenotazioneDao prenotazioneDao;
+    private ProiezioneDao proiezioneDao;
+    private PrenotazioneView prenotazioneView;
 
+    public PrenotazioneController() {
+        this.prenotazioneDao = new PrenotazioneDao();
+        this.proiezioneDao = new ProiezioneDao();
+        this.prenotazioneView = new PrenotazioneView();
     }
 
-    public void gestisciSelezioneProiezione() {
-        while (true) {
-            // 1. Carica proiezioni disponibili
-            List<Proiezione> proiezioni = proiezioneDAO.getProiezioniProssime();
+    public void start() {
+        boolean continua = true;
+        int scelta;
+        while (continua) {
+            try{
+                 scelta = prenotazioneView.mostraMenuPrenotazione();
+            } catch (Exception e) {
+                throw new RuntimeException("Errore durante la visualizzazione del menu: " + e.getMessage());
+            }
 
+
+
+
+            switch (scelta) {
+                case 1 -> nuovaPrenotazione();
+                case 2 -> confermaPrenotazione();
+                case 3 -> annullaPrenotazione();
+                case 4 -> visualizzaPrenotazione();
+                case 0 -> continua = false;
+                default -> prenotazioneView.mostraMessaggioErrore("Scelta non valida");
+            }
+        }
+    }
+
+    private void nuovaPrenotazione() {
+        try {
+            // 1. Mostra proiezioni disponibili
+            List<Proiezione> proiezioni = proiezioneDao.trovaProiezioniFuture();
             if (proiezioni.isEmpty()) {
-                view.mostraMessaggio("Nessuna proiezione disponibile nei prossimi 30 minuti - 2 ore");
+                prenotazioneView.mostraMessaggioErrore("Nessuna proiezione disponibile");
                 return;
             }
 
-            // 2. Mostra menu selezione
-            int scelta = view.mostraMenuSelezioneProiezione(proiezioni);
+            int sceltaProiezione = prenotazioneView.mostraMenuSelezioneProiezione(proiezioni);
+            if (sceltaProiezione == 0) return;
 
-            if (scelta == 0) {
-                break; // Torna al menu principale
+            if (sceltaProiezione < 1 || sceltaProiezione > proiezioni.size()) {
+                prenotazioneView.mostraMessaggioErrore("Selezione non valida");
+                return;
             }
 
-            if (scelta < 1 || scelta > proiezioni.size()) {
-                view.mostraErrore("Selezione non valida!");
-                continue;
-            }
+            Proiezione proiezioneDaPrenotare = proiezioni.get(sceltaProiezione - 1);
 
-            // 3. Proiezione selezionata
-            Proiezione proiezioneSelezionata = proiezioni.get(scelta - 1);
+            // 2. Mostra mappa posti
+            List<ProiezioneDao.PostoDisponibile> posti = proiezioneDao.getPostiDisponibili(proiezioneDaPrenotare.getIdProiezione());
+            prenotazioneView.mostraMappaPosti(posti, proiezioneDaPrenotare);
 
-            // 4. Gestisci dettagli e selezione posto
-            boolean prenotazioneCompletata = gestisciDettagliEPosti(proiezioneSelezionata);
+            // 3. Selezione posto
+            String postoParsed = prenotazioneView.richiediSelezionePosto();
+            if (postoParsed == null) return;
 
-            if (prenotazioneCompletata) {
-                break; // Prenotazione completata con successo
-            }
-        }
-    }
+            char fila = postoParsed.charAt(0);
+            byte numPosto = Byte.parseByte(postoParsed.substring(1));
 
-    private boolean gestisciDettagliEPosti(Proiezione proiezione) {
-        while (true) {
-            // 1. Carica dettagli film (usando il riferimento nella proiezione)
-            Film film = proiezione.getFilm();
-            if (film == null) {
-                film = filmDAO.getFilmByTitolo(proiezione.getTitoloFilm());
-                proiezione.setFilm(film);
-            }
+            // 4. Verifica disponibilità e crea prenotazione temporanea
+            prenotazioneView.mostraMessaggio("Creazione prenotazione in corso...");
 
-            // 2. Carica posti disponibili
-            Map<Character, List<Posto>> postiPerFila = postoDAO.getPostiRaggruppatiPerFila(
-                    proiezione.getIdProiezioneInt()
+            PrenotazioneDao.RisultatoPrenotazione risultato = prenotazioneDao.creaPrenotazioneTemporanea(
+                    proiezioneDaPrenotare.getIdProiezione(), fila, numPosto
             );
 
-            // 3. Mostra interfaccia integrata
-            int azione = view.mostraDettagliProiezione(proiezione, film, postiPerFila);
+            if (risultato.codiceRisultato == 1) {
+                prenotazioneView.mostraSuccesso("Prenotazione temporanea creata!");
+                prenotazioneView.mostraDettagliPrenotazioneTemporanea(risultato.codicePrenotazione,
+                        proiezioneDaPrenotare, postoParsed);
 
-            switch (azione) {
-                case 1: // Seleziona posto
-                    boolean success = gestisciSelezioneDelPosto(proiezione, postiPerFila);
-                    if (success) return true;
-                    break;
-
-                case 2: // Refresh posti
-                    continue; // Ricarica i dati
-
-                case 0: // Torna indietro
-                    return false;
-
-                default:
-                    view.mostraErrore("Opzione non valida!");
-            }
-        }
-    }
-
-    private boolean gestisciSelezioneDelPosto(Proiezione proiezione, Map<Character, List<Posto>> postiPerFila) {
-        // 1. Input selezione posto
-        Posto postoSelezionato = view.richiedeSelezioneP posto(postiPerFila);
-        if (postoSelezionato == null) return false;
-
-        // 2. Conferma selezione
-        boolean conferma = view.confermaSelezionePosto(proiezione, postoSelezionato);
-        if (!conferma) return false;
-
-        // 3. Crea prenotazione temporanea
-        RisultatoPrenotazione risultato = prenotazioneDAO.creaPrenotazioneTemporanea(
-                (short) proiezione.getIdProiezioneInt(),
-                postoSelezionato.getFila(),
-                (byte) postoSelezionato.getNumPosto()
-        );
-
-        if (!risultato.isSuccesso()) {
-            view.mostraErrore("Errore prenotazione: " + risultato.getMessaggio());
-            return false;
-        }
-
-        // 4. Gestisci timer e conferma
-        return gestisciConfermaPrenotazione(risultato, proiezione, postoSelezionato);
-    }
-
-    private boolean gestisciConfermaPrenotazione(RisultatoPrenotazione risultato,
-                                                 Proiezione proiezione, Posto posto) {
-        String codicePrenotazione = risultato.getCodicePrenotazione();
-
-        // Crea oggetto Prenotazione per il tracking
-        Prenotazione prenotazione = new Prenotazione(
-                codicePrenotazione,
-                (short) proiezione.getIdProiezioneInt(),
-                (byte) proiezione.getNumSalaInt(),
-                posto.getFila(),
-                (byte) posto.getNumPosto()
-        );
-        prenotazione.setProiezione(proiezione);
-        prenotazione.setPosto(posto);
-
-        // Timer di scadenza
-        Timer timerScadenza = new Timer();
-        AtomicBoolean scaduta = new AtomicBoolean(false);
-
-        timerScadenza.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                scaduta.set(true);
-                prenotazione.marcaScaduta();
-            }
-        }, 10 * 60 * 1000); // 10 minuti
-
-        try {
-            // Gestione interfaccia con countdown
-            boolean risultatoFinale = view.mostraGestionePrenotazioneTemporanea(
-                    prenotazione, scaduta, this::confermaPrenotazione, this::annullaPrenotazione
-            );
-
-            return risultatoFinale;
-
-        } finally {
-            timerScadenza.cancel();
-        }
-    }
-
-    private boolean confermaPrenotazione(Prenotazione prenotazione, String ticketPag) {
-        try {
-            // Chiama la stored procedure di conferma
-            boolean success = prenotazioneDAO.confermaPrenotazione(
-                    prenotazione.getCodicePrenotazione(),
-                    ticketPag
-            );
-
-            if (success) {
-                prenotazione.conferma(ticketPag);
-                view.mostraMessaggio("✅ Prenotazione confermata con successo!");
-                view.mostraRiepilogoPrenotazione(prenotazione);
-                return true;
+                // 5. Opzione per confermare immediatamente
+                if (prenotazioneView.chiedereConfermaImmediata()) {
+                    confermaPrenotazioneEsistente(risultato.codicePrenotazione);
+                }
             } else {
-                view.mostraErrore("Errore durante la conferma della prenotazione");
-                return false;
+                prenotazioneView.mostraMessaggioErrore(risultato.messaggio);
             }
+
+        } catch (SQLException e) {
+            prenotazioneView.mostraMessaggioErrore("Errore database: " + e.getMessage());
         } catch (Exception e) {
-            view.mostraErrore("Errore: " + e.getMessage());
-            return false;
+            prenotazioneView.mostraMessaggioErrore("Errore imprevisto: " + e.getMessage());
         }
     }
 
-    private boolean annullaPrenotazione(Prenotazione prenotazione) {
+    private void confermaPrenotazione() {
         try {
-            boolean success = prenotazioneDAO.annullaPrenotazione(prenotazione.getCodicePrenotazione());
-
-            if (success) {
-                prenotazione.annulla();
-                view.mostraMessaggio("Prenotazione annullata con successo");
-                return true;
-            } else {
-                view.mostraErrore("Errore durante l'annullamento");
-                return false;
+            String codicePrenotazione = prenotazioneView.richiediCodicePrenotazione();
+            if (codicePrenotazione == null || codicePrenotazione.trim().isEmpty()) {
+                return;
             }
+
+            confermaPrenotazioneEsistente(codicePrenotazione.trim());
+
         } catch (Exception e) {
-            view.mostraErrore("Errore: " + e.getMessage());
-            return false;
+            prenotazioneView.mostraMessaggioErrore("Errore: " + e.getMessage());
         }
+    }
+
+    private void confermaPrenotazioneEsistente(String codicePrenotazione) {
+        try {
+            // Verifica che la prenotazione esista e sia confermabile
+            Prenotazione prenotazione = prenotazioneDao.trovaPerCodice(codicePrenotazione);
+            if (prenotazione == null) {
+                prenotazioneView.mostraMessaggioErrore("Prenotazione non trovata");
+                return;
+            }
+
+            if (!prenotazione.isConfermabile()) {
+                prenotazioneView.mostraMessaggioErrore("Prenotazione non confermabile (scaduta o già confermata)");
+                return;
+            }
+
+            prenotazioneView.mostraDettagliPrenotazione(prenotazione);
+
+            // Simula pagamento
+            if (prenotazioneView.confermarePagamento()) {
+                String ticketPagamento = generaTicketPagamento();
+
+                PrenotazioneDao.RisultatoPrenotazione risultato = prenotazioneDao.confermaPrenotazione(
+                        codicePrenotazione, ticketPagamento
+                );
+
+                if (risultato.codiceRisultato == 1) {
+                    prenotazioneView.mostraSuccesso("Prenotazione confermata con successo!");
+                    prenotazioneView.mostraTicketPagamento(ticketPagamento);
+                } else {
+                    prenotazioneView.mostraMessaggioErrore(risultato.messaggio);
+                }
+            }
+
+        } catch (SQLException e) {
+            prenotazioneView.mostraMessaggioErrore("Errore database: " + e.getMessage());
+        }
+    }
+
+    private void annullaPrenotazione() {
+        try {
+            String codicePrenotazione = prenotazioneView.richiediCodicePrenotazione();
+            if (codicePrenotazione == null || codicePrenotazione.trim().isEmpty()) {
+                return;
+            }
+
+            Prenotazione prenotazione = prenotazioneDao.trovaPerCodice(codicePrenotazione);
+            if (prenotazione == null) {
+                prenotazioneView.mostraMessaggioErrore("Prenotazione non trovata");
+                return;
+            }
+
+            prenotazioneView.mostraDettagliPrenotazione(prenotazione);
+
+            if (prenotazioneView.confermareAnnullamento()) {
+                PrenotazioneDao.RisultatoPrenotazione risultato = prenotazioneDao.annullaPrenotazione(codicePrenotazione);
+
+                if (risultato.codiceRisultato == 1) {
+                    prenotazioneView.mostraSuccesso("Prenotazione annullata con successo");
+                } else {
+                    prenotazioneView.mostraMessaggioErrore(risultato.messaggio);
+                }
+            }
+
+        } catch (SQLException e) {
+            prenotazioneView.mostraMessaggioErrore("Errore database: " + e.getMessage());
+        } catch (Exception e) {
+            prenotazioneView.mostraMessaggioErrore("Errore: " + e.getMessage());
+        }
+    }
+
+    private void visualizzaPrenotazione() {
+        try {
+            String codicePrenotazione = prenotazioneView.richiediCodicePrenotazione();
+            if (codicePrenotazione == null || codicePrenotazione.trim().isEmpty()) {
+                return;
+            }
+
+            Prenotazione prenotazione = prenotazioneDao.trovaPerCodice(codicePrenotazione);
+            if (prenotazione == null) {
+                prenotazioneView.mostraMessaggioErrore("Prenotazione non trovata");
+                return;
+            }
+
+            // Carica anche i dettagli della proiezione
+            Proiezione proiezione = proiezioneDao.trovaPerIId(prenotazione.getIdProiezione());
+            prenotazione.setProiezione(proiezione);
+
+            prenotazioneView.mostraDettagliCompleti(prenotazione);
+
+        } catch (SQLException e) {
+            prenotazioneView.mostraMessaggioErrore("Errore database: " + e.getMessage());
+        } catch (Exception e) {
+            prenotazioneView.mostraMessaggioErrore("Errore: " + e.getMessage());
+        }
+    }
+
+    private String generaTicketPagamento() {
+        return "PAY_" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

@@ -4,20 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e9c18be-13d4-4365-9308-c7e79eb0d1a4" name="Changes" comment="stesura iniziale delle classi model del dominio della soluzione">
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/ApplicationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/Controller.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/PrenotazioneController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/FilmDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PostoDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ProiezioneDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/PrenotazioneView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/StartView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/domain/Film.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/domain/Film.java" afterDir="false" />
+    <list default="true" id="8e9c18be-13d4-4365-9308-c7e79eb0d1a4" name="Changes" comment="continuazione client java, da rivedere meccanismo di prenotazione">
+      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/exception/DAOException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ConnectionFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/GenericProcedureDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/db.proprietes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/ApplicationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/ApplicationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/PrenotazioneController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/PrenotazioneController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/FilmDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/FilmDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PostoDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PostoDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ProiezioneDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ProiezioneDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/domain/Proiezione.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/domain/Proiezione.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../claudb.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../claudb.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/PrenotazioneView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/PrenotazioneView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/StartView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/StartView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,27 +51,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/java/it/uniroma2/dicii/claupiscu/Main.java",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/java/it/uniroma2/dicii/claupiscu&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/java/it/uniroma2/dicii/claupiscu/Main.java&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="it.uniroma2.dicii.claupiscu.model.domain" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="it.uniroma2.dicii.claupiscu.model.dao" />
     </key>
   </component>
   <component name="RunManager">
@@ -95,8 +104,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.25410.129" />
-        <option value="bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-IU-251.25410.129" />
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26094.121" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-IU-251.26094.121" />
       </set>
     </attachedChunks>
   </component>
@@ -108,7 +117,11 @@
       <option name="presentableId" value="Default" />
       <updated>1749147295977</updated>
       <workItem from="1749147296960" duration="2588000" />
-      <workItem from="1749192916842" duration="14907000" />
+      <workItem from="1749192916842" duration="17018000" />
+      <workItem from="1749398361009" duration="238000" />
+      <workItem from="1749399347788" duration="164000" />
+      <workItem from="1749465082262" duration="1593000" />
+      <workItem from="1749473671922" duration="1774000" />
     </task>
     <task id="LOCAL-00001" summary="stesura iniziale delle classi model del dominio della soluzione">
       <option name="closed" value="true" />
@@ -118,7 +131,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749149835300</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="continuazione client java, da rivedere meccanismo di prenotazione">
+      <option name="closed" value="true" />
+      <created>1749300784138</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1749300784138</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -137,6 +158,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="stesura iniziale delle classi model del dominio della soluzione" />
-    <option name="LAST_COMMIT_MESSAGE" value="stesura iniziale delle classi model del dominio della soluzione" />
+    <MESSAGE value="continuazione client java, da rivedere meccanismo di prenotazione" />
+    <option name="LAST_COMMIT_MESSAGE" value="continuazione client java, da rivedere meccanismo di prenotazione" />
   </component>
 </project>

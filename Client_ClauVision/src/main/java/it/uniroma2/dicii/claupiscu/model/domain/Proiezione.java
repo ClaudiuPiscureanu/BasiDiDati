@@ -6,6 +6,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Proiezione {
+    private String nomeSala;
+
+
+
     public enum StatoProiezione {
         PROGRAMMATA, IN_CORSO, TERMINATA
     }
@@ -47,6 +51,9 @@ public class Proiezione {
 
     public String getNomeSala() {
         return this.sala != null ? this.sala.getNomeSala() : "Sala " + numSala;
+    }
+    public void setNomeSala(String nomeSala) {
+        this.nomeSala = nomeSala;
     }
     public BigDecimal getPrezzo() { return prezzo; }
     public void setPrezzo(BigDecimal prezzo) { this.prezzo = prezzo; }
