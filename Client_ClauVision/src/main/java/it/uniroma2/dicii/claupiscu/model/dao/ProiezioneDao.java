@@ -138,6 +138,7 @@ public class ProiezioneDao {
 
         // Informazioni aggiuntive dalla join
         proiezione.setNomeSala(rs.getString("nome_sala"));
+        proiezione.setNomeSala(rs.getString("nome_sala"));
         proiezione.setDurataMinuti(rs.getByte("durata_minuti"));
 
         return proiezione;
