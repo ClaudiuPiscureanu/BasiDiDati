@@ -201,13 +201,14 @@ public class PrenotazioneController {
             prenotazioneView.mostraMessaggio("⏳ Creazione prenotazione in corso...");
 
             char fila = posto.charAt(0);
+            logger.info("fila scelta: "+ fila );
             byte numPosto = Byte.parseByte(posto.substring(1));
-
+            logger.info("numPosto scelto: "+ numPosto );
             PrenotazioneDao.RisultatoPrenotazione risultato = prenotazioneDao.creaPrenotazioneTemporanea(
                     proiezione.getIdProiezione(), fila, numPosto
             );
-
-            if (risultato.codiceRisultato == 1) {
+            logger.info("codice risultato creazione: "+ risultato.codiceRisultato + "");
+            if (risultato.codiceRisultato == -2) { // da rivedere : mettere 1->-2
                 prenotazioneView.mostraSuccesso("✅ Prenotazione temporanea creata!");
                 prenotazioneView.mostraDettagliPrenotazioneTemporanea(
                         risultato.codicePrenotazione, proiezione, posto);

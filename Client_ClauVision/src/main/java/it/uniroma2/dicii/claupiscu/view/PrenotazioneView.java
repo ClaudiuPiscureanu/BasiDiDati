@@ -21,7 +21,7 @@ public class PrenotazioneView {
     public int mostraMenuPrenotazione() throws IOException {
         clearScreen();
         System.out.println("╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    GESTIONE PRENOTAZIONI                        ║");
+        System.out.println("║                    GESTIONE PRENOTAZIONI                         ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
         System.out.println("║ [1] Nuova prenotazione                                           ║");
         System.out.println("║ [2] Conferma prenotazione                                        ║");
@@ -41,7 +41,7 @@ public class PrenotazioneView {
     public int mostraMenuSelezioneProiezione(List<Proiezione> proiezioni) {
         clearScreen();
         System.out.println("╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    SELEZIONE PROIEZIONE                         ║");
+        System.out.println("║                    SELEZIONE PROIEZIONE                          ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
 
         for (int i = 0; i < proiezioni.size(); i++) {
@@ -51,13 +51,14 @@ public class PrenotazioneView {
                     p.getDataOraInizio()
             ).toMinutes();
 
-            System.out.printf("║ [%d] %-50s ║%n", i + 1, p.getTitoloFilm());
-            System.out.printf("║     🎬 Sala: %-8s  ⏰ %s (tra %d min) ║%n",
+            System.out.printf("║ [%d] %-60s ║%n", i + 1, p.getTitoloFilm());
+            System.out.printf("║     🎬 Sala: %-8s  ⏰ %s (tra %d min) %10s ║%n",
                     p.getNomeSala(),
                     p.getDataOraInizio().format(FORMATTER),
-                    minutiMancanti);
-            System.out.printf("║     ⏱️  %d min     💰 €%.2f                          ║%n",
-                    p.getDurataMinuti(), p.getPrezzo());
+                    minutiMancanti,
+                    " ");
+            System.out.printf("║     ⏱️  %d min     💰 €%.2f               %-13s           ║%n",
+                    p.getDurataMinuti(), p.getPrezzo(),"");
             System.out.println("╠══════════════════════════════════════════════════════════════════╣");
         }
 
@@ -75,28 +76,28 @@ public class PrenotazioneView {
     public void mostraMappaPosti(List<ProiezioneDao.PostoDisponibile> posti, Proiezione proiezione) {
         clearScreen();
         System.out.println("╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                        MAPPA POSTI                              ║");
-        System.out.printf("║ Film: %-55s ║%n", proiezione.getTitoloFilm());
-        System.out.printf("║ Orario: %-52s ║%n", proiezione.getDataOraInizio().format(FORMATTER));
+        System.out.println("║                        MAPPA POSTI                               ║");
+        System.out.printf("║ Film: %-58s ║%n", proiezione.getTitoloFilm());
+        System.out.printf("║ Orario: %-56s ║%n", proiezione.getDataOraInizio().format(FORMATTER));
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.println("║                           SCHERMO                               ║");
+        System.out.println("║                           SCHERMO                                ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
 
         char filaCorrente = 0;
         for (ProiezioneDao.PostoDisponibile posto : posti) {
             if (posto.fila != filaCorrente) {
-                if (filaCorrente != 0) System.out.println(" ║");
+                if (filaCorrente != 0) System.out.printf(" %-40s ║%n", " ");
                 filaCorrente = posto.fila;
                 System.out.printf("║ %c │", posto.fila);
             }
 
-            String simbolo = posto.disponibile ? "⚪" : "🔴";
+            String simbolo = posto.disponibile ? "o" : "x";
             System.out.printf(" %s", simbolo);
         }
-        if (filaCorrente != 0) System.out.println(" ║");
+        if (filaCorrente != 0) System.out.printf(" %-40s ║%n", "");
 
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.println("║ Legenda: ⚪ Disponibile  🔴 Occupato                           ║");
+        System.out.println("║ Legenda: o Disponibile  x Occupato                               ║");
         System.out.println("╚══════════════════════════════════════════════════════════════════╝");
     }
 
@@ -121,12 +122,12 @@ public class PrenotazioneView {
         System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
         System.out.println("║                 PRENOTAZIONE TEMPORANEA CREATA                  ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Codice: %-55s ║%n", codice);
-        System.out.printf("║ Film: %-57s ║%n", proiezione.getTitoloFilm());
-        System.out.printf("║ Posto: %-56s ║%n", posto);
+        System.out.printf("║ Codice: %-60s ║%n", codice);
+        System.out.printf("║ Film: %-60s ║%n", proiezione.getTitoloFilm());
+        System.out.printf("║ Posto: %-60s ║%n", posto);
         System.out.printf("║ Prezzo: €%-53.2f ║%n", proiezione.getPrezzo());
         System.out.println("║                                                                  ║");
-        System.out.println("║ ⚠️  ATTENZIONE: Hai 10 minuti per confermare!                  ║");
+        System.out.println("║ ⚠️  ATTENZIONE: Hai 10 minuti per confermare!                    ║");
         System.out.println("╚══════════════════════════════════════════════════════════════════╝");
     }
 
@@ -143,11 +144,11 @@ public class PrenotazioneView {
 
     public void mostraDettagliPrenotazione(Prenotazione prenotazione) {
         System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    DETTAGLI PRENOTAZIONE                        ║");
+        System.out.println("║                    DETTAGLI PRENOTAZIONE                         ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Codice: %-55s ║%n", prenotazione.getCodicePrenotazione());
-        System.out.printf("║ Posto: %-56s ║%n", prenotazione.getCodicePosto());
-        System.out.printf("║ Stato: %-55s ║%n", prenotazione.getStatoPrenotazione());
+        System.out.printf("║ Codice: %-60s ║%n", prenotazione.getCodicePrenotazione());
+        System.out.printf("║ Posto: %-60s ║%n", prenotazione.getCodicePosto());
+        System.out.printf("║ Stato: %-60s ║%n", prenotazione.getStatoPrenotazione());
 
         if (prenotazione.getStatoPrenotazione() == Prenotazione.StatoPrenotazione.TEMPORANEA) {
             System.out.printf("║ Scade tra: %-49d minuti ║%n", prenotazione.getMinutiRimanenti());
@@ -162,25 +163,25 @@ public class PrenotazioneView {
 
     public void mostraDettagliCompleti(Prenotazione prenotazione) {
         System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    DETTAGLI COMPLETI                            ║");
+        System.out.println("║                    DETTAGLI COMPLETI                             ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
         System.out.printf("║ Codice: %-55s ║%n", prenotazione.getCodicePrenotazione());
 
         if (prenotazione.getProiezione() != null) {
-            System.out.printf("║ Film: %-57s ║%n", prenotazione.getProiezione().getTitoloFilm());
-            System.out.printf("║ Orario: %-54s ║%n", prenotazione.getProiezione().getDataOraInizio().format(FORMATTER));
+            System.out.printf("║ Film: %-60s ║%n", prenotazione.getProiezione().getTitoloFilm());
+            System.out.printf("║ Orario: %-60s ║%n", prenotazione.getProiezione().getDataOraInizio().format(FORMATTER));
             System.out.printf("║ Prezzo: €%-53.2f ║%n", prenotazione.getProiezione().getPrezzo());
         }
 
-        System.out.printf("║ Posto: %-56s ║%n", prenotazione.getCodicePosto());
-        System.out.printf("║ Stato: %-55s ║%n", prenotazione.getStatoPrenotazione());
+        System.out.printf("║ Posto: %-60s ║%n", prenotazione.getCodicePosto());
+        System.out.printf("║ Stato: %-60s ║%n", prenotazione.getStatoPrenotazione());
 
         if (prenotazione.getTimestampCreazione() != null) {
-            System.out.printf("║ Creata: %-54s ║%n", prenotazione.getTimestampCreazione().format(FORMATTER));
+            System.out.printf("║ Creata: %-60s ║%n", prenotazione.getTimestampCreazione().format(FORMATTER));
         }
 
         if (prenotazione.getTimestampConferma() != null) {
-            System.out.printf("║ Confermata: %-49s ║%n", prenotazione.getTimestampConferma().format(FORMATTER));
+            System.out.printf("║ Confermata: %-60s ║%n", prenotazione.getTimestampConferma().format(FORMATTER));
         }
 
         if (prenotazione.getTicketPag() != null) {

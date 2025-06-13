@@ -38,7 +38,6 @@ public class PrenotazioneDao {
             stmt.setShort(1, idProiezione);
             stmt.setString(2, String.valueOf(fila));
             stmt.setByte(3, numPosto);
-
             // Parametri di output
             stmt.registerOutParameter(4, Types.VARCHAR); // codice_prenotazione
             stmt.registerOutParameter(5, Types.INTEGER); // risultato

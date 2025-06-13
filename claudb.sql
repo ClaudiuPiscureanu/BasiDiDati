@@ -67,7 +67,7 @@ CREATE TABLE film(
 --
 
 CREATE TABLE proiezione(
-    id_proiezione SMALLINT  UNSIGNED NOT NULL AUTO_INCREMENT,        -- The unsigned range is 0 to 65535.
+    id_proiezione SMALLINT  UNSIGNED NOT NULL AUTO_INCREMENT,        -- The unsigned range is 0 to 65,535.
     titolo_film VARCHAR(128) NOT NULL,
     num_sala TINYINT UNSIGNED NOT NULL,
     prezzo DECIMAL(5,2) NOT NULL,
@@ -86,7 +86,7 @@ CREATE TABLE proiezione(
 --
 
 CREATE TABLE prenotazione(
-    codice_prenotazione VARCHAR(20) NOT NULL,   -- The unsigned range is 0 to 65535.
+    codice_prenotazione VARCHAR(20) NOT NULL,   -- The unsigned range is 0 to 65,535.
     num_sala TINYINT UNSIGNED NOT NULL,
     fila CHAR(1) NOT NULL,
     num_posto TINYINT UNSIGNED NOT NULL,
@@ -271,16 +271,20 @@ proc_exit: BEGIN
         num_posto,
         stato_prenotazione,
         timestamp_creazione,
-        timestamp_scadenza
+        timestamp_scadenza,
+        data_ora_prenotazione,
+        data_ora_conferma
     ) VALUES (
         p_codice_prenotazione, 
         p_id_proiezione, 
         v_num_sala, 
-        p_fila, 
+        p_fila,
         p_num_posto,
         'TEMPORANEA',
         NOW(),
-        DATE_ADD(NOW(), INTERVAL 10 MINUTE)
+        DATE_ADD(NOW(), INTERVAL 10 MINUTE),
+        NOW(),
+        NULL
     );
 
     -- log operazione
