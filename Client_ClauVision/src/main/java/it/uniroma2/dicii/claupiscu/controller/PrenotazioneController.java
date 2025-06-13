@@ -13,12 +13,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Controller per la gestione delle prenotazioni cinematografiche
- *
- * @author Claudio Piscitelli
- * @version 2.0
- */
+
 public class PrenotazioneController {
     private static final Logger logger = Logger.getLogger(PrenotazioneController.class.getName());
 
@@ -96,7 +91,7 @@ public class PrenotazioneController {
         String postoParsed = selezionaPosto(proiezioneDaPrenotare);
 
         // 4. Creazione prenotazione temporanea
-        String codicePrenotazione = creaPrenotazioneTemporanea(proiezioneDaPrenotare, postoParsed);
+        String codicePrenotazione = CreaPrenotazioneTemporanea(proiezioneDaPrenotare, postoParsed);
 
         // 5. Opzione conferma immediata
         if (prenotazioneView.chiedereConfermaImmediata()) {
@@ -195,7 +190,7 @@ public class PrenotazioneController {
     /**
      * Crea una prenotazione temporanea nel sistema
      */
-    private String creaPrenotazioneTemporanea(Proiezione proiezione, String posto)
+    private String CreaPrenotazioneTemporanea(Proiezione proiezione, String posto)
             throws DatabaseException, PostoNonDisponibileException {
         try {
             prenotazioneView.mostraMessaggio("⏳ Creazione prenotazione in corso...");
@@ -208,7 +203,7 @@ public class PrenotazioneController {
                     proiezione.getIdProiezione(), fila, numPosto
             );
             logger.info("codice risultato creazione: "+ risultato.codiceRisultato + "");
-            if (risultato.codiceRisultato == -2) { // da rivedere : mettere 1->-2
+            if (risultato.codiceRisultato == 1) { // da rivedere : mettere 1->-2
                 prenotazioneView.mostraSuccesso("✅ Prenotazione temporanea creata!");
                 prenotazioneView.mostraDettagliPrenotazioneTemporanea(
                         risultato.codicePrenotazione, proiezione, posto);

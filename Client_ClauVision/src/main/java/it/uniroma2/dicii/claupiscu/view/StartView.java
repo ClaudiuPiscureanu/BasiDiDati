@@ -1,29 +1,34 @@
 
 package it.uniroma2.dicii.claupiscu.view;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class StartView {
-    int choice;
-    public int menuInziale () throws IOException {
-      System.out.println("Benvenuto in Claupiscu");
-            System.out.println("Scegli quale operazione vuoi eseguire:");
-            System.out.println("1. Vedi film disponibili");
-            System.out.println("2. Annulla una prenotazione");
-            System.out.println("3. Manutenzione");
+    private void stampaAsciiArt() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/resources/asciiArt.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Errore nella lettura del file ASCII art: " + e.getMessage());
+        }
+    }
+    public int menuInziale()    {
+        stampaAsciiArt();
 
         Scanner input = new Scanner(System.in);
-        int choice = 0;
         while (true) {
-            System.out.print("->  ");
-            choice = input.nextInt();
-            if (choice >= 1 && choice <= 3) {
-                break;
-            }
-            System.out.println("opzione non valida, scegli tra 1 e 3: ");
+            System.out.print("[invio]  ");
+            String choice = input.nextLine().trim().toLowerCase();
+            if (choice.isEmpty()) return 1;
+            if (choice.equals("proprietario")) return 2;
+            System.out.println("premi invio per iniziare");
         }
+    }
 
-        return choice;
-}
+
 }

@@ -2,16 +2,16 @@
 package it.uniroma2.dicii.claupiscu.model.dao;
 
 import it.uniroma2.dicii.claupiscu.model.domain.Prenotazione;
-import it.uniroma2.dicii.claupiscu.model.domain.Posto;
-import it.uniroma2.dicii.claupiscu.model.domain.Proiezione;
+
 
 import java.sql.*;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class PrenotazioneDao {
 
+    static final String messErroreDefault = " errore sconosciuto : ("; // errore sonarclou d:(
     public static class RisultatoPrenotazione {
         public final int codiceRisultato;
         public final String codicePrenotazione;
@@ -52,7 +52,7 @@ public class PrenotazioneDao {
                 case 0 -> "Posto già occupato o in prenotazione";
                 case -1 -> "Proiezione non valida o posto inesistente";
                 case -2 -> "Errore durante la prenotazione";
-                default -> "Errore sconosciuto";
+                default -> messErroreDefault;
             };
 
             return new RisultatoPrenotazione(risultato, codicePrenotazione, messaggio);
@@ -82,7 +82,7 @@ public class PrenotazioneDao {
                 case 0 -> "Prenotazione non trovata";
                 case -1 -> "Prenotazione scaduta o già confermata";
                 case -2 -> "Errore durante la conferma";
-                default -> "Errore sconosciuto";
+                default -> messErroreDefault;
             };
 
             return new RisultatoPrenotazione(risultato, codicePrenotazione, messaggio);
@@ -110,7 +110,7 @@ public class PrenotazioneDao {
                 case 0 -> "Prenotazione non trovata";
                 case -1 -> "Troppo tardi per annullare (meno di 30 minuti alla proiezione)";
                 case -2 -> "Errore durante l'annullamento";
-                default -> "Errore sconosciuto";
+                default -> messErroreDefault;
             };
 
             return new RisultatoPrenotazione(risultato, codicePrenotazione, messaggio);

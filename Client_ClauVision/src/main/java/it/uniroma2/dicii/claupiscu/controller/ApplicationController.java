@@ -13,11 +13,7 @@ public class ApplicationController implements Controller{
         StartView startView = new StartView();
         int choice;
         System.out.println("ApplicationController started!");
-        try {
-            choice = startView.menuInziale();
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
+        choice = startView.menuInziale();
         switch (choice) {
             case 1:
                 //prenota biglietto
@@ -25,15 +21,10 @@ public class ApplicationController implements Controller{
                 prenotazioneController.start();
                 break;
             case 2:
-                //annulla prenotazione
-                System.out.println("PrenotazioneController started!");
-                prenotazioneController.start();
-                break;
-
-            case 3:
                 //manutenzione
+                gestioneCinemaController.start();
                 System.out.println("ManutenzioneController started!");
-
+                break;
         }
 
     }

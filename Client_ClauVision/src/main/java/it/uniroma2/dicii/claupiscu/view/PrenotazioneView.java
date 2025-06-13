@@ -8,17 +8,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
-import java.io.IOException;
+
 
 public class PrenotazioneView {
-    private Scanner scanner;
+    private final Scanner scanner;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public PrenotazioneView() {
         this.scanner = new Scanner(System.in);
     }
 
-    public int mostraMenuPrenotazione() throws IOException {
+    public int mostraMenuPrenotazione()  {
         clearScreen();
         System.out.println("╔══════════════════════════════════════════════════════════════════╗");
         System.out.println("║                    GESTIONE PRENOTAZIONI                         ║");
@@ -32,7 +32,7 @@ public class PrenotazioneView {
         System.out.print("Scelta: ");
 
         try {
-            return Integer.parseInt(scanner.nextLine().trim());
+            return Integer.parseInt(scanner.nextLine().trim());  //trim rimuove gli spazi
         } catch (NumberFormatException e) {
             return -1;
         }
@@ -105,7 +105,7 @@ public class PrenotazioneView {
         System.out.print("Inserisci il posto (es: A05, B12): ");
         String input = scanner.nextLine().trim().toUpperCase();
 
-        if (input.isEmpty() || input.length() < 2) {
+        if (input.length() < 2) {
             return null;
         }
 
@@ -120,12 +120,12 @@ public class PrenotazioneView {
 
     public void mostraDettagliPrenotazioneTemporanea(String codice, Proiezione proiezione, String posto) {
         System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                 PRENOTAZIONE TEMPORANEA CREATA                  ║");
+        System.out.println("║                 PRENOTAZIONE TEMPORANEA CREATA                   ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Codice: %-60s ║%n", codice);
-        System.out.printf("║ Film: %-60s ║%n", proiezione.getTitoloFilm());
-        System.out.printf("║ Posto: %-60s ║%n", posto);
-        System.out.printf("║ Prezzo: €%-53.2f ║%n", proiezione.getPrezzo());
+        System.out.printf("║ Codice: %-56s ║%n", codice);
+        System.out.printf("║ Film: %s║%n", proiezione.getTitoloFilm()+" ".repeat(66-7-proiezione.getTitoloFilm().length()));       //7+titolo
+        System.out.printf("║ Posto: %-57s ║%n", posto);
+        System.out.printf("║ Prezzo: €%-54.2f ║%n", proiezione.getPrezzo());
         System.out.println("║                                                                  ║");
         System.out.println("║ ⚠️  ATTENZIONE: Hai 10 minuti per confermare!                    ║");
         System.out.println("╚══════════════════════════════════════════════════════════════════╝");
