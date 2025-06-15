@@ -1,26 +1,47 @@
 package it.uniroma2.dicii.claupiscu.view;
 
-import it.uniroma2.dicii.claupiscu.model.domain.Film;
-import it.uniroma2.dicii.claupiscu.model.domain.Posto;
+import it.uniroma2.dicii.claupiscu.model.dao.ProiezioneDao;
 import it.uniroma2.dicii.claupiscu.model.domain.Prenotazione;
 import it.uniroma2.dicii.claupiscu.model.domain.Proiezione;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
-public class PrenotazioneView{
-    private Scanner scanner;
+
+public class PrenotazioneView {
+    private final Scanner scanner;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     public PrenotazioneView() {
         this.scanner = new Scanner(System.in);
     }
 
+    public int mostraMenuPrenotazione()  {
+        clearScreen();
+        System.out.println("╔══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                    GESTIONE PRENOTAZIONI                         ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ [1] Nuova prenotazione                                           ║");
+        System.out.println("║ [2] Conferma prenotazione                                        ║");
+        System.out.println("║ [3] Annulla prenotazione                                         ║");
+        System.out.println("║ [4] Visualizza prenotazione                                      ║");
+        System.out.println("║ [0] Torna al menu principale                                     ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+        System.out.print("Scelta: ");
+
+        try {
+            return Integer.parseInt(scanner.nextLine().trim());  //trim rimuove gli spazi
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     public int mostraMenuSelezioneProiezione(List<Proiezione> proiezioni) {
         clearScreen();
         System.out.println("╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    SELEZIONE PROIEZIONE                         ║");
+        System.out.println("║                    SELEZIONE PROIEZIONE                          ║");
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
 
         for (int i = 0; i < proiezioni.size(); i++) {
@@ -30,13 +51,14 @@ public class PrenotazioneView{
                     p.getDataOraInizio()
             ).toMinutes();
 
-            System.out.printf("║ [%d] %-40s ║%n", i + 1, p.getTitoloFilm());
-            System.out.printf("║     🎬 %s  ⏰ %s (tra %d min) ║%n",
+            System.out.printf("║ [%d] %-60s ║%n", i + 1, p.getTitoloFilm());
+            System.out.printf("║     🎬 Sala: %-8s  ⏰ %s (tra %d min) %10s ║%n",
                     p.getNomeSala(),
-                    p.getOrarioFormattato(),
-                    minutiMancanti);
-            System.out.printf("║     ⏱️  %d min     💰 €%.2f                    ║%n",
-                    p.getDurataMinuti(), p.getPrezzo());
+                    p.getDataOraInizio().format(FORMATTER),
+                    minutiMancanti,
+                    " ");
+            System.out.printf("║     ⏱️  %d min     💰 €%.2f               %-13s           ║%n",
+                    p.getDurataMinuti(), p.getPrezzo(),"");
             System.out.println("╠══════════════════════════════════════════════════════════════════╣");
         }
 
@@ -44,264 +66,169 @@ public class PrenotazioneView{
         System.out.println("╚══════════════════════════════════════════════════════════════════╝");
         System.out.print("Seleziona proiezione: ");
 
-        return leggiIntero(0, proiezioni.size());
-    }
-
-    public int mostraDettagliProiezione(Proiezione proiezione, Film film,
-                                        Map<Character, List<Posto>> postiPerFila) {
-        clearScreen();
-
-        // Header informazioni film
-        System.out.println("╔══════════════════════════════════════════════════════════════════╗");
-        System.out.printf("║ 🎬 %-60s ║%n", film.getTitoloFilm());
-        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ 🏢 Casa: %-54s ║%n", film.getCasaCinematografica());
-        System.out.printf("║ ⏱️  Durata: %d minuti                                          ║%n", film.getDurataMinuti());
-
-        // Gestisci cast lungo
-        String cast = film.getCastAttori();
-        if (cast.length() > 55) {
-            System.out.printf("║ 🎭 Cast: %-55s ║%n", cast.substring(0, 52) + "...");
-        } else {
-            System.out.printf("║ 🎭 Cast: %-55s ║%n", cast);
-        }
-
-        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ 📅 %s - %s - €%.2f              ║%n",
-                proiezione.getDataFormattata(),
-                proiezione.getOrarioFormattato(),
-                proiezione.getPrezzo());
-        System.out.printf("║ 🎪 %s                                                    ║%n",
-                proiezione.getNomeSala());
-        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
-
-        // Mappa posti
-        mostraMappaPosti(postiPerFila);
-
-        // Menu opzioni
-        System.out.println("\n╔══════════════════════════════════════╗");
-        System.out.println("║ [1] Seleziona posto                  ║");
-        System.out.println("║ [2] Aggiorna posti disponibili       ║");
-        System.out.println("║ [0] Torna alla lista proiezioni      ║");
-        System.out.println("╚══════════════════════════════════════╝");
-        System.out.print("Scegli azione: ");
-
-        return leggiIntero(0, 2);
-    }
-
-    private void mostraMappaPosti(Map<Character, List<Posto>> postiPerFila) {
-        System.out.println("\n                           🎬 SCHERMO 🎬");
-        System.out.println("    ┌─────────────────────────────────────────────────────┐");
-
-        // Ordina le file alfabeticamente
-        postiPerFila.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .forEach(entry -> {
-                    char fila = entry.getKey();
-                    List<Posto> posti = entry.getValue();
-
-                    System.out.printf(" %c  │ ", fila);
-
-                    // Ordina i posti per numero
-                    posti.stream()
-                            .sorted((p1, p2) -> Integer.compare(p1.getNumPosto(), p2.getNumPosto()))
-                            .forEach(posto -> {
-                                switch (posto.getStato()) {
-                                    case DISPONIBILE:
-                                        System.out.printf("%2d ", posto.getNumPosto());
-                                        break;
-                                    case OCCUPATO:
-                                        System.out.print("██ ");
-                                        break;
-                                    case SELEZIONATO:
-                                        System.out.printf("[%d]", posto.getNumPosto());
-                                        break;
-                                }
-                            });
-                    System.out.println(" │");
-                });
-
-        System.out.println("    └─────────────────────────────────────────────────────┘");
-        System.out.println("    Legenda: [N] = Disponibile, ██ = Occupato");
-    }
-
-    public boolean mostraGestionePrenotazioneTemporanea(Prenotazione prenotazione,
-                                                        AtomicBoolean scaduta,
-                                                        Function<Prenotazione, Boolean> confermaCallback,
-                                                        Function<Prenotazione, Boolean> annullaCallback) {
-
-        while (!scaduta.get() && prenotazione.isConfermabile()) {
-            clearScreen();
-
-            long minutiRimasti = prenotazione.getMinutiRimanenti();
-            long secondiRimasti = java.time.Duration.between(
-                    LocalDateTime.now(),
-                    prenotazione.getTimestampScadenza()
-            ).toSeconds() % 60;
-
-            System.out.println("╔══════════════════════════════════════════════════════════════════╗");
-            System.out.println("║                  PRENOTAZIONE TEMPORANEA                        ║");
-            System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-            System.out.printf("║ Codice: %-56s ║%n", prenotazione.getCodicePrenotazione());
-            System.out.printf("║ Posto: %s                                                  ║%n",
-                    prenotazione.getCodicePosto());
-            System.out.printf("║ Film: %-57s ║%n", prenotazione.getProiezione().getTitoloFilm());
-            System.out.printf("║ ⏰ Tempo rimasto: %02d:%02d                                      ║%n",
-                    minutiRimasti, Math.max(0, secondiRimasti));
-            System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-            System.out.println("║ [1] Conferma prenotazione (inserisci ticket pagamento)          ║");
-            System.out.println("║ [2] Annulla prenotazione                                         ║");
-            System.out.println("║ [0] Aspetta (aggiorna countdown)                                 ║");
-            System.out.println("╚══════════════════════════════════════════════════════════════════╝");
-            System.out.print("Scegli azione: ");
-
-            int scelta = leggiInteroConTimeout(0, 2, 3000); // 3 secondi timeout
-
-            switch (scelta) {
-                case 1:
-                    return gestisciConfermaFinale(prenotazione);
-                case 2:
-                    return annullaCallback.apply(prenotazione);
-                case 0:
-                default:
-                    // Continua il loop per aggiornare
-                    break;
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
-
-        mostraMessaggio("⚠️ Prenotazione scaduta automaticamente!");
-        return false;
-    }
-
-    private boolean gestisciConfermaFinale(Prenotazione prenotazione) {
-        System.out.print("\nInserisci codice ticket pagamento: ");
-        String ticketPag = scanner.nextLine().trim();
-
-        if (ticketPag.isEmpty()) {
-            mostraErrore("Codice ticket non valido!");
-            return false;
-        }
-
-        // Simula chiamata al DAO
         try {
-            prenotazione.conferma(ticketPag);
-            mostraMessaggio("✅ Prenotazione confermata con successo!");
-            mostraRiepilogoPrenotazione(prenotazione);
-            return true;
-        } catch (Exception e) {
-            mostraErrore("Errore durante la conferma: " + e.getMessage());
-            return false;
+            return Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 
-    public void mostraRiepilogoPrenotazione(Prenotazione prenotazione) {
-        System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    RIEPILOGO PRENOTAZIONE                       ║");
+    public void mostraMappaPosti(List<ProiezioneDao.PostoDisponibile> posti, Proiezione proiezione) {
+        clearScreen();
+        System.out.println("╔══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                        MAPPA POSTI                               ║");
+        System.out.printf("║ Film: %-58s ║%n", proiezione.getTitoloFilm());
+        System.out.printf("║ Orario: %-56s ║%n", proiezione.getDataOraInizio().format(FORMATTER));
         System.out.println("╠══════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Codice: %-56s ║%n", prenotazione.getCodicePrenotazione());
-        System.out.printf("║ Film: %-59s ║%n", prenotazione.getProiezione().getTitoloFilm());
-        System.out.printf("║ Sala: %-59s ║%n", prenotazione.getProiezione().getNomeSala());
-        System.out.printf("║ Posto: %-58s ║%n", prenotazione.getCodicePosto());
-        System.out.printf("║ Orario: %-57s ║%n", prenotazione.getProiezione().getOrarioCompleto());
-        System.out.printf("║ Prezzo: €%-56.2f ║%n", prenotazione.getProiezione().getPrezzo());
-        System.out.printf("║ Ticket: %-57s ║%n", prenotazione.getTicketPag());
-        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
-        System.out.println("📧 Riceverai email di conferma a breve.");
-        System.out.println("Premi INVIO per continuare...");
-        scanner.nextLine();
-    }
+        System.out.println("║                           SCHERMO                                ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
 
-    // Metodi utility
-    private int leggiIntero(int min, int max) {
-        while (true) {
-            try {
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) continue;
-
-                int valore = Integer.parseInt(input);
-                if (valore >= min && valore <= max) {
-                    return valore;
-                }
-                System.out.printf("Inserisci un numero tra %d e %d: ", min, max);
-            } catch (NumberFormatException e) {
-                System.out.print("Inserisci un numero valido: ");
+        char filaCorrente = 0;
+        for (ProiezioneDao.PostoDisponibile posto : posti) {
+            if (posto.fila != filaCorrente) {
+                if (filaCorrente != 0) System.out.printf(" %-40s ║%n", " ");
+                filaCorrente = posto.fila;
+                System.out.printf("║ %c │", posto.fila);
             }
+
+            String simbolo = posto.disponibile ? "o" : "x";
+            System.out.printf(" %s", simbolo);
         }
+        if (filaCorrente != 0) System.out.printf(" %-40s ║%n", "");
+
+        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ Legenda: o Disponibile  x Occupato                               ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
     }
 
-    private int leggiInteroConTimeout(int min, int max, long timeoutMs) {
-        // Per semplicità, implementazione base
-        // In produzione useresti input non-bloccante
-        return leggiIntero(min, max);
+    public String richiediSelezionePosto() {
+        System.out.print("Inserisci il posto (es: A05, B12): ");
+        String input = scanner.nextLine().trim().toUpperCase();
+
+        if (input.length() < 2) {
+            return null;
+        }
+
+        // Validazione formato (lettera + numeri)
+        if (!input.matches("[A-Z]\\d+")) {
+            mostraMessaggioErrore("Formato non valido. Usa formato come A05, B12");
+            return null;
+        }
+
+        return input;
     }
 
-    private void clearScreen() {
-        System.out.print("\033[2J\033[H");
-        System.out.flush();
+    public void mostraDettagliPrenotazioneTemporanea(String codice, Proiezione proiezione, String posto) {
+        System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                 PRENOTAZIONE TEMPORANEA CREATA                   ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+        System.out.printf("║ Codice: %-56s ║%n", codice);
+        System.out.printf("║ Film: %s║%n", proiezione.getTitoloFilm()+" ".repeat(66-7-proiezione.getTitoloFilm().length()));       //7+titolo
+        System.out.printf("║ Posto: %-57s ║%n", posto);
+        System.out.printf("║ Prezzo: €%-54.2f ║%n", proiezione.getPrezzo());
+        System.out.println("║                                                                  ║");
+        System.out.println("║ ⚠️  ATTENZIONE: Hai 10 minuti per confermare!                    ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+    }
+
+    public boolean chiedereConfermaImmediata() {
+        System.out.print("Vuoi confermare subito la prenotazione? (s/n): ");
+        String risposta = scanner.nextLine().trim().toLowerCase();
+        return risposta.equals("s") || risposta.equals("si") || risposta.equals("y") || risposta.equals("yes");
+    }
+
+    public String richiediCodicePrenotazione() {
+        System.out.print("Inserisci il codice prenotazione: ");
+        return scanner.nextLine().trim();
+    }
+
+    public void mostraDettagliPrenotazione(Prenotazione prenotazione) {
+        System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                    DETTAGLI PRENOTAZIONE                         ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+        System.out.printf("║ Codice: %-60s ║%n", prenotazione.getCodicePrenotazione());
+        System.out.printf("║ Posto: %-60s ║%n", prenotazione.getCodicePosto());
+        System.out.printf("║ Stato: %-60s ║%n", prenotazione.getStatoPrenotazione());
+
+        if (prenotazione.getStatoPrenotazione() == Prenotazione.StatoPrenotazione.TEMPORANEA) {
+            System.out.printf("║ Scade tra: %-49d minuti ║%n", prenotazione.getMinutiRimanenti());
+        }
+
+        if (prenotazione.getTimestampCreazione() != null) {
+            System.out.printf("║ Creata: %-54s ║%n", prenotazione.getTimestampCreazione().format(FORMATTER));
+        }
+
+        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+    }
+
+    public void mostraDettagliCompleti(Prenotazione prenotazione) {
+        System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                    DETTAGLI COMPLETI                             ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+        System.out.printf("║ Codice: %-55s ║%n", prenotazione.getCodicePrenotazione());
+
+        if (prenotazione.getProiezione() != null) {
+            System.out.printf("║ Film: %-60s ║%n", prenotazione.getProiezione().getTitoloFilm());
+            System.out.printf("║ Orario: %-60s ║%n", prenotazione.getProiezione().getDataOraInizio().format(FORMATTER));
+            System.out.printf("║ Prezzo: €%-53.2f ║%n", prenotazione.getProiezione().getPrezzo());
+        }
+
+        System.out.printf("║ Posto: %-60s ║%n", prenotazione.getCodicePosto());
+        System.out.printf("║ Stato: %-60s ║%n", prenotazione.getStatoPrenotazione());
+
+        if (prenotazione.getTimestampCreazione() != null) {
+            System.out.printf("║ Creata: %-60s ║%n", prenotazione.getTimestampCreazione().format(FORMATTER));
+        }
+
+        if (prenotazione.getTimestampConferma() != null) {
+            System.out.printf("║ Confermata: %-60s ║%n", prenotazione.getTimestampConferma().format(FORMATTER));
+        }
+
+        if (prenotazione.getTicketPag() != null) {
+            System.out.printf("║ Ticket: %-54s ║%n", prenotazione.getTicketPag());
+        }
+
+        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+    }
+
+    public boolean confermarePagamento() {
+        System.out.println("\n💳 Procedi con il pagamento?");
+        System.out.print("Conferma (s/n): ");
+        String risposta = scanner.nextLine().trim().toLowerCase();
+        return risposta.equals("s") || risposta.equals("si") || risposta.equals("y") || risposta.equals("yes");
+    }
+
+    public boolean confermareAnnullamento() {
+        System.out.println("\n⚠️  Sei sicuro di voler annullare questa prenotazione?");
+        System.out.print("Conferma annullamento (s/n): ");
+        String risposta = scanner.nextLine().trim().toLowerCase();
+        return risposta.equals("s") || risposta.equals("si") || risposta.equals("y") || risposta.equals("yes");
+    }
+
+    public void mostraTicketPagamento(String ticket) {
+        System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                      PAGAMENTO CONFERMATO                       ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+        System.out.printf("║ Ticket di pagamento: %-42s ║%n", ticket);
+        System.out.println("║                                                                  ║");
+        System.out.println("║ 🎫 Conserva questo ticket come ricevuta del pagamento           ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════╝");
+    }
+
+    public void mostraSuccesso(String messaggio) {
+        System.out.println("\n✅ " + messaggio);
+    }
+
+    public void mostraMessaggioErrore(String messaggio) {
+        System.out.println("\n❌ " + messaggio);
     }
 
     public void mostraMessaggio(String messaggio) {
         System.out.println("\n" + messaggio);
-        System.out.println("Premi INVIO per continuare...");
-        scanner.nextLine();
     }
 
-    public void mostraErrore(String errore) {
-        System.out.println("\n❌ ERRORE: " + errore);
-        System.out.println("Premi INVIO per continuare...");
-        scanner.nextLine();
-    }
-
-    // Altri metodi richiesti dal controller...
-    public Posto richiedeSelezioneP posto(Map<Character, List<Posto>> postiPerFila) {
-        System.out.println("\n📍 SELEZIONE POSTO");
-        System.out.print("Inserisci fila (es. A, B, C...): ");
-        String filaInput = scanner.nextLine().trim().toUpperCase();
-
-        if (filaInput.length() != 1) {
-            mostraErrore("Fila non valida!");
-            return null;
-        }
-
-        char fila = filaInput.charAt(0);
-
-        if (!postiPerFila.containsKey(fila)) {
-            mostraErrore("Fila non esistente!");
-            return null;
-        }
-
-        System.out.print("Inserisci numero posto: ");
-        int numPosto = leggiIntero(1, 50);
-
-        // Cerca il posto
-        List<Posto> postiDiQuestaFila = postiPerFila.get(fila);
-        return postiDiQuestaFila.stream()
-                .filter(p -> p.getNumPosto() == numPosto)
-                .filter(p -> p.getStato() == StatoPosto.DISPONIBILE)
-                .findFirst()
-                .orElse(null);
-    }
-
-    public boolean confermaSelezionePosto(Proiezione proiezione, Posto posto) {
-        System.out.println("\n╔══════════════════════════════════════╗");
-        System.out.println("║           CONFERMA SELEZIONE         ║");
-        System.out.println("╠══════════════════════════════════════╣");
-        System.out.printf("║ Film: %-30s ║%n", proiezione.getTitoloFilm());
-        System.out.printf("║ Sala: %-30s ║%n", proiezione.getNomeSala());
-        System.out.printf("║ Orario: %-28s ║%n", proiezione.getOrarioCompleto());
-        System.out.printf("║ Posto: Fila %c, Numero %d           ║%n", posto.getFila(), posto.getNumPosto());
-        System.out.printf("║ Prezzo: €%.2f                      ║%n", proiezione.getPrezzo());
-        System.out.println("╚══════════════════════════════════════╝");
-        System.out.print("Confermi la selezione? (s/n): ");
-
-        String risposta = scanner.nextLine().trim().toLowerCase();
-        return risposta.equals("s") || risposta.equals("si");
+    private void clearScreen() {
+        // Semplice clear per console
+        System.out.print("\033[2J\033[H");
     }
 }

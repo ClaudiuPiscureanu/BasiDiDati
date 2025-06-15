@@ -1,75 +1,34 @@
 
 package it.uniroma2.dicii.claupiscu.view;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class StartView {
-    private Scanner  scanner = new Scanner(System.in);
-
-    public StartView() {}
-    public int startView () {
-        boolean continua = true;
-
-        while (continua) {
-            stampaOpzioni();
-            int scelta = leggiScelta();
-
-            switch (scelta) {
-                case 1:
-                    return 1;
-                case 2:
-                    return 2;
-                case 3:
-                    return 3;
-                case 0:
-                    continua = false;
-                    System.out.println("Arrivederci!");
-                    break;
-                default:
-                    System.out.println("Opzione non valida. Riprova.");
-                    break;
+    private void stampaAsciiArt() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/resources/asciiArt.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
             }
-
-            if (continua) {
-                pausaEContinua();
-            }
-        }
-        return 0;
-    }
-
-    private void stampaOpzioni() {
-        System.out.println("\n" + "=".repeat(40));
-        System.out.println("         MENU PRINCIPALE");
-        System.out.println("=".repeat(40));
-        System.out.println("1. Prenotare un biglietto");
-        System.out.println("2. Annullare una prenotazione");
-        System.out.println("3. Manutenzione");
-        System.out.println("0. Esci");
-        System.out.println("=".repeat(40));
-        System.out.print("Seleziona un'opzione: ");
-    }
-
-    private int leggiScelta() {
-        try {
-            int scelta = scanner.nextInt();
-            scanner.nextLine(); // Consuma il newline rimasto
-            return scelta;
-        } catch (Exception e) {
-            scanner.nextLine(); // Pulisce l'input non valido
-            return -1; // Ritorna un valore non valido
+        } catch (IOException e) {
+            System.out.println("Errore nella lettura del file ASCII art: " + e.getMessage());
         }
     }
-    private void pausaEContinua() {
-        System.out.println("\nPremi INVIO per continuare...");
-        scanner.nextLine();
-    }
+    public int menuInziale()    {
+        stampaAsciiArt();
 
-    /**
-     * Chiude le risorse utilizzate dalla View
-     */
-    public void chiudi() {
-        if (scanner != null) {
-            scanner.close();
+        Scanner input = new Scanner(System.in);
+        while (true) {
+            System.out.print("[invio]  ");
+            String choice = input.nextLine().trim().toLowerCase();
+            if (choice.isEmpty()) return 1;
+            if (choice.equals("proprietario")) return 2;
+            System.out.println("premi invio per iniziare");
         }
     }
+
+
 }
