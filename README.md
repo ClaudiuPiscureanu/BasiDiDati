@@ -24,7 +24,7 @@ Include un database relazionale MySQL e un thin client Java per la gestione dell
 
 ---
 
-##🚀 Avvio del Thin Client Java (CLI)
+## 🚀 Avvio del Thin Client Java (CLI)
 
   git clone " html del repositori"
   javac -cp .:mysql-connector-java.jar src/*.java
