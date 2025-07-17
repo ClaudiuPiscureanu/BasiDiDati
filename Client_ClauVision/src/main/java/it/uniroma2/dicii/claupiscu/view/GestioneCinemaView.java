@@ -1,5 +1,8 @@
 package it.uniroma2.dicii.claupiscu.view;
 
+import it.uniroma2.dicii.claupiscu.model.domain.Film;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class GestioneCinemaView {
@@ -55,5 +58,12 @@ public class GestioneCinemaView {
     private void clearScreen() {
         // Semplice clear per console
         System.out.print("\033[2J\033[H");
+    }
+
+    public void mostraListaFilm(List<Film> films) {
+    }
+
+    public int mostraMenuGestioneFilm() {
+        return 0;
     }
 }

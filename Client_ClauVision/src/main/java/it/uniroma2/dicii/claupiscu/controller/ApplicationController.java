@@ -5,7 +5,7 @@ import it.uniroma2.dicii.claupiscu.view.StartView;
 import java.io.IOException;
 
 public class ApplicationController implements Controller{
-    GestioneCinemaController gestioneCinemaController = new GestioneCinemaController();
+    //GestioneCinemaController gestioneCinemaController = new GestioneCinemaController();
     PrenotazioneController prenotazioneController = new PrenotazioneController();
 
     @Override
@@ -22,7 +22,7 @@ public class ApplicationController implements Controller{
                 break;
             case 2:
                 //manutenzione
-                gestioneCinemaController.start();
+                //gestioneCinemaController.start();
                 System.out.println("ManutenzioneController started!");
                 break;
         }

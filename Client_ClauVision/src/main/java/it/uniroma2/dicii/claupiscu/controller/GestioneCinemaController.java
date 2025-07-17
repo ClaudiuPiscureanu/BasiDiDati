@@ -1,6 +1,5 @@
 package it.uniroma2.dicii.claupiscu.controller;
 
-import it.uniroma2.dicii.claupiscu.exception.PrenotazioneEccezioni;
 import it.uniroma2.dicii.claupiscu.model.dao.PrenotazioneDao;
 import it.uniroma2.dicii.claupiscu.model.dao.ProiezioneDao;
 import it.uniroma2.dicii.claupiscu.model.domain.Film;
@@ -29,8 +28,8 @@ public class GestioneCinemaController implements Controller {
         this.gestioneCinemaView = new GestioneCinemaView();
     }
 
-    /// Avvio menu principale del sistema di gestione del cinema
-    public void start() throws GestioneCinemaException {
+    // Avvio menu principale del sistema di gestione del cinema
+    public void start()  {
         boolean continua = true;
         try {
             if (!verificaPassword()) {
@@ -100,25 +99,34 @@ public class GestioneCinemaController implements Controller {
         }
     }
 
+    private void mostraStatistiche() {
+    }
+
+    private void gestioneSale() {
+    }
+
+    private void gestioneProiezioni() {
+    }
+
     private void gestioneFilm() throws SQLException, GestioneCinemaException {
         boolean continua = true;
 
         while (continua) {
-            int scelta = view.mostraMenuGestioneFilm();
+            int scelta = gestioneCinemaView.mostraMenuGestioneFilm();
 
             switch (scelta) {
                 case 1 -> aggiungiFilm();
                 case 2 -> eliminaFilm();
                 case 3 -> visualizzaFilm();
                 case 0 -> continua = false;
-                default -> view.mostraMessaggioErrore("Scelta non valida");
+                default -> gestioneCinemaView.mostraMessaggioErrore("Scelta non valida");
             }
         }
     }
 
     private void aggiungiFilm() throws SQLException, GestioneCinemaException {
         try {
-            String titolo = view.richiediTitoloFilm();
+            String titolo = gestioneCinemaView.richiediTitoloFilm();
             if (titolo == null || titolo.trim().isEmpty()) {
                 throw new GestioneCinemaException("Titolo film obbligatorio");
             }
@@ -129,13 +137,13 @@ public class GestioneCinemaController implements Controller {
                 throw new GestioneCinemaException("Film già presente nel sistema");
             }
 
-            int durata = view.richiediDurataFilm();
+            int durata = gestioneCinemaView.richiediDurataFilm();
             if (durata <= 0 || durata > 300) {
                 throw new GestioneCinemaException("Durata non valida (deve essere tra 1 e 300 minuti)");
             }
 
-            String casaCinematografica = view.richiediCasaCinematografica();
-            List<Film.Attore> attori = view.richiediAttori();
+            String casaCinematografica = gestioneCinemaView.richiediCasaCinematografica();
+            List<Film.Attore> attori = gestioneCinemaView.richiediAttori();
 
             Film nuovoFilm = new Film();
             nuovoFilm.setTitoloFilm(titolo);
@@ -144,7 +152,7 @@ public class GestioneCinemaController implements Controller {
             nuovoFilm.setAttori(attori);
 
             filmDao.inserisci(nuovoFilm);
-            view.mostraSuccesso("Film aggiunto con successo!");
+            gestioneCinemaView.mostraSuccesso("Film aggiunto con successo!");
 
         } catch (SQLException e) {
             throw new GestioneCinemaException("Errore durante l'inserimento del film: " + e.getMessage());
@@ -154,12 +162,12 @@ public class GestioneCinemaController implements Controller {
     private void eliminaFilm() throws SQLException, GestioneCinemaException {
         List<Film> films = filmDao.trovaTuttiFilm();
         if (films.isEmpty()) {
-            view.mostraMessaggio("Nessun film presente nel sistema");
+            gestioneCinemaView.mostraMessaggio("Nessun film presente nel sistema");
             return;
         }
 
-        view.mostraListaFilm(films);
-        String titolo = view.richiediTitoloFilm();
+        gestioneCinemaView.mostraListaFilm(films);
+        String titolo = gestioneCinemaView.richiediTitoloFilm();
 
         Film film = filmDao.trovaPerTitolo(titolo);
         if (film == null) {
