@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e9c18be-13d4-4365-9308-c7e79eb0d1a4" name="Changes" comment="inizio parte gestione Cinema">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a/storage_v2/_src_/schema/claudb.m4sPrw.zip" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a/storage_v2/_src_/schema/claudb.m4sPrw.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/ApplicationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/ApplicationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/LoginController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/exception/GestioneCinemaException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/exception/GestioneCinemaException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/GestioneCinemaView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/GestioneCinemaView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/LoginView.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../template-progetto3.odt" beforeDir="false" afterPath="$PROJECT_DIR$/../template-progetto3.odt" afterDir="false" />
-    </list>
+    <list default="true" id="8e9c18be-13d4-4365-9308-c7e79eb0d1a4" name="Changes" comment="inizio parte gestione Cinema" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -97,37 +83,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;SONARLINT_PRECOMMIT_ANALYSIS&quot;: &quot;true&quot;,
-    &quot;database.data.extractors.current.export.id&quot;: &quot;Comma-separated (CSV)_id&quot;,
-    &quot;database.data.extractors.current.id&quot;: &quot;Comma-separated (CSV)_id&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;#2 on con-eccezioni&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/mariadb-java-client-3.5.3.jar&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/java/it/uniroma2/dicii/claupiscu/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.1150748&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propCompiler&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Main.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "SONARLINT_PRECOMMIT_ANALYSIS": "true",
+    "database.data.extractors.current.export.id": "Comma-separated (CSV)_id",
+    "database.data.extractors.current.id": "Comma-separated (CSV)_id",
+    "git-widget-placeholder": "con-eccezioni",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/mariadb-java-client-3.5.3.jar",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/java/it/uniroma2/dicii/claupiscu/Main.java",
+    "project.structure.last.edited": "Global Libraries",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.1150748",
+    "settings.editor.selected.configurable": "project.propCompiler",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mariadb&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mariadb"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="it.uniroma2.dicii.claupiscu.model.domain" />
@@ -204,6 +190,7 @@
       <workItem from="1750775626917" duration="6674000" />
       <workItem from="1750844587753" duration="133000" />
       <workItem from="1750844760162" duration="61000" />
+      <workItem from="1753175846819" duration="130000" />
     </task>
     <task id="LOCAL-00001" summary="stesura iniziale delle classi model del dominio della soluzione">
       <option name="closed" value="true" />
