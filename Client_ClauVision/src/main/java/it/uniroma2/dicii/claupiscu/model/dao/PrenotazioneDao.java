@@ -110,6 +110,7 @@ public class PrenotazioneDao {
                 case 0 -> "Prenotazione non trovata";
                 case -1 -> "Troppo tardi per annullare (meno di 30 minuti alla proiezione)";
                 case -2 -> "Errore durante l'annullamento";
+                case -3 -> "Stato non valido per l'annullamento";
                 default -> messErroreDefault;
             };
 
@@ -123,7 +124,7 @@ public class PrenotazioneDao {
     public Prenotazione trovaPerCodice(String codicePrenotazione) throws SQLException {
         String sql = """
             SELECT p.codice_prenotazione, p.num_sala, p.fila, p.num_posto, p.id_proiezione,
-                   p.data_ora_prenotazione, p.data_ora_conferma, p.stato_prenotazione,
+                    p.stato_prenotazione,
                    p.timestamp_creazione, p.ticket_pag, p.timestamp_conferma, p.timestamp_scadenza
             FROM prenotazione p
             WHERE p.codice_prenotazione = ?
@@ -145,10 +146,11 @@ public class PrenotazioneDao {
     /**
      * Ottiene tutte le prenotazioni per una proiezione
      */
-    public List<Prenotazione> trovaPerProiezione(short idProiezione) throws SQLException {
+    public List<Prenotazione>
+
+    trovaPerProiezione(short idProiezione) throws SQLException {
         String sql = """
-            SELECT p.codice_prenotazione, p.num_sala, p.fila, p.num_posto, p.id_proiezione,
-                   p.data_ora_prenotazione, p.data_ora_conferma, p.stato_prenotazione,
+            SELECT p.codice_prenotazione, p.num_sala, p.fila, p.num_posto, p.id_proiezione, p.stato_prenotazione,
                    p.timestamp_creazione, p.ticket_pag, p.timestamp_conferma, p.timestamp_scadenza
             FROM prenotazione p
             WHERE p.id_proiezione = ?
@@ -183,15 +185,6 @@ public class PrenotazioneDao {
         prenotazione.setNumPosto(rs.getByte("num_posto"));
         prenotazione.setIdProiezione(rs.getShort("id_proiezione"));
 
-        Timestamp dataOraPrenotazione = rs.getTimestamp("data_ora_prenotazione");
-        if (dataOraPrenotazione != null) {
-            prenotazione.setDataOraPrenotazione(dataOraPrenotazione.toLocalDateTime());
-        }
-
-        Timestamp dataOraConferma = rs.getTimestamp("data_ora_conferma");
-        if (dataOraConferma != null) {
-            prenotazione.setDataOraConferma(dataOraConferma.toLocalDateTime());
-        }
 
         String statoStr = rs.getString("stato_prenotazione");
         prenotazione.setStatoPrenotazione(Prenotazione.StatoPrenotazione.valueOf(statoStr));

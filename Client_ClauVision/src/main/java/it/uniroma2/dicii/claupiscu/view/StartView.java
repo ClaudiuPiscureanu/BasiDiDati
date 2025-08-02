@@ -24,9 +24,10 @@ public class StartView {
         while (true) {
             System.out.print("[invio]  ");
             String choice = input.nextLine().trim().toLowerCase();
+
+            System.out.println("Comando Stellare, rispondi!");
             if (choice.isEmpty()) return 1;
             if (choice.equals("proprietario")) return 2;
-            System.out.println("premi invio per iniziare");
         }
     }
 

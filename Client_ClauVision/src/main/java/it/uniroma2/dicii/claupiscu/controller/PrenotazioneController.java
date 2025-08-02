@@ -38,6 +38,8 @@ public class PrenotazioneController {
         while (continua) {
             try {
                 int scelta = prenotazioneView.mostraMenuPrenotazione();
+
+
                 continua = processaSceltaMenu(scelta);
 
             } catch (Exception e) {

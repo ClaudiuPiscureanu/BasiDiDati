@@ -1225,7 +1225,7 @@
       <Definer>root@localhost</Definer>
       <DetailsLevel>3</DetailsLevel>
       <RoutineKind>procedure</RoutineKind>
-      <SourceTextLength>1328</SourceTextLength>
+      <SourceTextLength>2082</SourceTextLength>
     </routine>
     <routine id="516" parent="511" name="CleanupPrenotazioniScadute">
       <Definer>root@localhost</Definer>
@@ -1518,7 +1518,7 @@
       <Predicate>json_valid(`dettagli`)</Predicate>
     </check>
     <column id="574" parent="526" name="id_log">
-      <AutoIncrement>42</AutoIncrement>
+      <AutoIncrement>51</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>bigint(20) unsigned|0s</StoredType>

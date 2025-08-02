@@ -14,8 +14,6 @@ public class Prenotazione {
     private char fila;
     private byte numPosto;
     private short idProiezione;
-    private LocalDateTime dataOraPrenotazione;
-    private LocalDateTime dataOraConferma;
     private StatoPrenotazione statoPrenotazione;
     private LocalDateTime timestampCreazione;
     private String ticketPag;
@@ -59,11 +57,6 @@ public class Prenotazione {
     public short getIdProiezione() { return idProiezione; }
     public void setIdProiezione(short idProiezione) { this.idProiezione = idProiezione; }
 
-    public LocalDateTime getDataOraPrenotazione() { return dataOraPrenotazione; }
-    public void setDataOraPrenotazione(LocalDateTime dataOraPrenotazione) { this.dataOraPrenotazione = dataOraPrenotazione; }
-
-    public LocalDateTime getDataOraConferma() { return dataOraConferma; }
-    public void setDataOraConferma(LocalDateTime dataOraConferma) { this.dataOraConferma = dataOraConferma; }
 
     public StatoPrenotazione getStatoPrenotazione() { return statoPrenotazione; }
     public void setStatoPrenotazione(StatoPrenotazione statoPrenotazione) { this.statoPrenotazione = statoPrenotazione; }
@@ -120,7 +113,6 @@ public class Prenotazione {
         if (isConfermabile()) {
             this.statoPrenotazione = StatoPrenotazione.CONFERMATA;
             this.timestampConferma = LocalDateTime.now();
-            this.dataOraConferma = this.timestampConferma;
             this.ticketPag = ticketPagamento;
         }
     }
