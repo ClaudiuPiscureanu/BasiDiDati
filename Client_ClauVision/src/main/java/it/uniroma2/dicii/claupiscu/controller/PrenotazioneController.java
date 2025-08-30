@@ -65,7 +65,7 @@ public class PrenotazioneController {
                 case 0 -> {
                     return false;
                 }
-                default -> throw new InputNonValidoException("Scelta menu non valida: " + scelta);
+                default -> throw new InputNonValidoException("Scelta menu non valida " );
             }
         } catch (PrenotazioneException e) {
             gestisciEccezionePrenotazione(e);
@@ -86,7 +86,7 @@ public class PrenotazioneController {
         // 1. Verifica disponibilità proiezioni
         List<Proiezione> proiezioni = caricaProiezioniFuture();
 
-        // 2. Selezione proiezione
+        // 2. Selezione proiiiuuuezione
         Proiezione proiezioneDaPrenotare = selezionaProiezione(proiezioni);
 
         // 3. Selezione posto

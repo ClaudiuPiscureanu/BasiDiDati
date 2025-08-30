@@ -5,20 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e9c18be-13d4-4365-9308-c7e79eb0d1a4" name="Changes" comment="inizio parte gestione Cinema">
+      <change afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/SalaDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a/storage_v2/_src_/schema/claudb.m4sPrw.zip" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a/storage_v2/_src_/schema/claudb.m4sPrw.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/ApplicationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/ApplicationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/PrenotazioneController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/PrenotazioneController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/FilmDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/FilmDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/domain/Prenotazione.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/domain/Prenotazione.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/PrenotazioneView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/PrenotazioneView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/GestioneCinemaView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/GestioneCinemaView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/StartView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/view/StartView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Testo/raggionamenti.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Testo/raggionamenti.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -105,17 +111,20 @@
     "database.data.extractors.current.id": "Comma-separated (CSV)_id",
     "git-widget-placeholder": "#2 on con-eccezioni",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/mariadb-java-client-3.5.3.jar",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/java/it/uniroma2/dicii/claupiscu/Main.java",
-    "project.structure.last.edited": "Global Libraries",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.1150748",
+    "project.structure.side.proportion": "0.3494687",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "project.propCompiler",
+    "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -126,6 +135,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="it.uniroma2.dicii.claupiscu.model.dao" />
       <recent name="it.uniroma2.dicii.claupiscu.model.domain" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
@@ -145,6 +155,7 @@
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="it.uniroma2.dicii.claupiscu.Main" />
       <module name="Client_ClauVision" />
+      <option name="VM_PARAMETERS" value="-Djava.util.logging.level=WARNING" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="it.uniroma2.dicii.claupiscu.*" />
@@ -160,6 +171,10 @@
       <script-mode>FILE</script-mode>
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Application.Main" />
+      <item itemvalue="Database Script.AnnullaPrenotazione@(varchar(20))P.sql" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.Main" />
@@ -170,8 +185,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.27812.49" />
-        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.27812.49" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
       </set>
     </attachedChunks>
   </component>
@@ -207,7 +222,19 @@
       <workItem from="1750844587753" duration="133000" />
       <workItem from="1750844760162" duration="61000" />
       <workItem from="1753175846819" duration="130000" />
-      <workItem from="1754137306513" duration="8853000" />
+      <workItem from="1754137306513" duration="8901000" />
+      <workItem from="1754205926886" duration="441000" />
+      <workItem from="1754560151765" duration="211000" />
+      <workItem from="1754560409467" duration="429000" />
+      <workItem from="1754561253370" duration="2090000" />
+      <workItem from="1754664293154" duration="1340000" />
+      <workItem from="1754921539593" duration="207000" />
+      <workItem from="1755935382670" duration="469000" />
+      <workItem from="1755935869028" duration="2625000" />
+      <workItem from="1756201827187" duration="2458000" />
+      <workItem from="1756221260651" duration="2096000" />
+      <workItem from="1756383084343" duration="2963000" />
+      <workItem from="1756542202933" duration="3593000" />
     </task>
     <task id="LOCAL-00001" summary="stesura iniziale delle classi model del dominio della soluzione">
       <option name="closed" value="true" />
@@ -350,33 +377,39 @@
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/PrenotazioneController.java</url>
-          <line>89</line>
-          <option name="timeStamp" value="25" />
+          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java</url>
+          <line>109</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/domain/Film.java</url>
+          <line>10</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ConnectionFactory.java</url>
+          <line>10</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/FilmDao.java</url>
+          <line>79</line>
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java</url>
-          <line>72</line>
-          <option name="timeStamp" value="31" />
+          <line>165</line>
+          <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java</url>
-          <line>107</line>
-          <option name="timeStamp" value="38" />
-        </line-breakpoint>
-        <line-breakpoint type="java-method">
-          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ConnectionFactory.java</url>
-          <line>13</line>
-          <properties class="it.uniroma2.dicii.claupiscu.model.dao.ConnectionFactory" method="&lt;init&gt;">
-            <option name="EMULATED" value="true" />
-            <option name="WATCH_EXIT" value="false" />
-          </properties>
-          <option name="timeStamp" value="18" />
+          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/GestioneCinemaController.java</url>
+          <line>168</line>
+          <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint type="java-method">
           <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ProiezioneDao.java</url>
           <line>125</line>
-          <properties class="it.uniroma2.dicii.claupiscu.model.dao.ProiezioneDao" method="trovaProiezioniFuture">
+          <properties class="it.uniroma2.dicii.claupiscu.model.dao.ProiezioneDao">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
@@ -385,7 +418,7 @@
         <line-breakpoint type="java-method">
           <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ProiezioneDao.java</url>
           <line>307</line>
-          <properties class="it.uniroma2.dicii.claupiscu.model.dao.ProiezioneDao" method="mapResultSetToProiezione">
+          <properties class="it.uniroma2.dicii.claupiscu.model.dao.ProiezioneDao">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
@@ -394,7 +427,7 @@
         <line-breakpoint type="java-method">
           <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/controller/PrenotazioneController.java</url>
           <line>174</line>
-          <properties class="it.uniroma2.dicii.claupiscu.controller.PrenotazioneController" method="validaFormatoPosto">
+          <properties class="it.uniroma2.dicii.claupiscu.controller.PrenotazioneController">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
@@ -420,7 +453,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java</url>
-          <line>123</line>
+          <line>125</line>
           <properties class="it.uniroma2.dicii.claupiscu.model.dao.PrenotazioneDao" method="trovaPerCodice">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
@@ -428,13 +461,13 @@
           <option name="timeStamp" value="33" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java</url>
-          <line>94</line>
-          <properties class="it.uniroma2.dicii.claupiscu.model.dao.PrenotazioneDao" method="annullaPrenotazione">
+          <url>file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/ConnectionFactory.java</url>
+          <line>13</line>
+          <properties class="it.uniroma2.dicii.claupiscu.model.dao.ConnectionFactory" method="&lt;init&gt;">
             <option name="EMULATED" value="true" />
             <option name="WATCH_EXIT" value="false" />
           </properties>
-          <option name="timeStamp" value="37" />
+          <option name="timeStamp" value="41" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -448,5 +481,9 @@
         <watch expression="posto.disponibile" language="JAVA" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

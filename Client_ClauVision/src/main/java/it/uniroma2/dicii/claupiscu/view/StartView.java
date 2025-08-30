@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 public class StartView {
     private void stampaAsciiArt() {
+        // tips: chage the path to the file to your own file
         try (BufferedReader reader = new BufferedReader(new FileReader("/home/claupiscu/Documents/Projects/programmazione/BasiDiDati/Client_ClauVision/src/main/resources/asciiArt.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -17,7 +18,7 @@ public class StartView {
             System.out.println("Errore nella lettura del file ASCII art: " + e.getMessage());
         }
     }
-    public int menuInziale()    {
+    public int menuIniziale()    {
         stampaAsciiArt();
 
         Scanner input = new Scanner(System.in);
@@ -25,9 +26,16 @@ public class StartView {
             System.out.print("[invio]  ");
             String choice = input.nextLine().trim().toLowerCase();
 
-            System.out.println("Comando Stellare, rispondi!");
-            if (choice.isEmpty()) return 1;
-            if (choice.equals("proprietario")) return 2;
+            if (choice.isEmpty()) {
+                // User just pressed Enter, continue to  prenotazione
+                System.out.println("Comando Stellare, rispondi!");
+                return 1;
+            }
+            else if (choice.equals("proprietario")) { // enter in proprietario mode
+                System.out.println("Non posso rivelare dettagli della mia missione segreta.");
+                return 2;
+            }
+            // If user enters something else, loop back and ask again
         }
     }
 

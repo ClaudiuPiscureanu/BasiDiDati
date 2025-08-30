@@ -72,4 +72,65 @@ public class FilmDao {
 
         return film;
     }
+
+    /**
+     * Inserisce un nuovo film nel database
+     */
+    public void inserisci(Film film) throws SQLException {
+        String sql = """
+            INSERT INTO film (titolo_film, durata_minuti, casa_cinematografica, cast_attori)
+            VALUES (?, ?, ?, ?)
+            """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, film.getTitoloFilm());
+            stmt.setByte(2, film.getDurataMinuti());
+            stmt.setString(3, film.getCasaCinematografica());
+            stmt.setString(4, film.getCastAttori());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Inserimento film fallito, nessuna riga interessata.");
+            }
+        }
+    }
+
+    /**
+     * Aggiorna un film esistente
+     */
+    public boolean aggiorna(Film film) throws SQLException {
+        String sql = """
+            UPDATE film 
+            SET durata_minuti = ?, casa_cinematografica = ?, cast_attori = ?
+            WHERE titolo_film = ?
+            """;
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setByte(1, film.getDurataMinuti());
+            stmt.setString(2, film.getCasaCinematografica());
+            stmt.setString(3, film.getCastAttori());
+            stmt.setString(4, film.getTitoloFilm());
+
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Elimina un film per titolo
+     */
+    public boolean elimina(String titoloFilm) throws SQLException {
+        String sql = "DELETE FROM film WHERE titolo_film = ?";
+
+        try (Connection conn = ConnectionFactory.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, titoloFilm);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
 }

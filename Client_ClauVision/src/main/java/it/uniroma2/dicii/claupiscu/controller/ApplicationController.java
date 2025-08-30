@@ -1,30 +1,26 @@
 package it.uniroma2.dicii.claupiscu.controller;
 
 import it.uniroma2.dicii.claupiscu.view.StartView;
-
-import java.io.IOException;
-
+import it.uniroma2.dicii.claupiscu.controller.GestioneCinemaController;
 public class ApplicationController implements Controller{
-    //GestioneCinemaController gestioneCinemaController = new GestioneCinemaController();
-    PrenotazioneController prenotazioneController = new PrenotazioneController();
 
     @Override
     public void start()  {
         StartView startView = new StartView();
         int choice;
-        System.out.println("ApplicationController started!");
-        choice = startView.menuInziale();
+        choice = startView.menuIniziale();
         switch (choice) {
             case 1:
-                //prenota biglietto
-                System.out.println("GestioneCinemaController started!");
+                //go to booking screen
+                PrenotazioneController prenotazioneController = new PrenotazioneController();
+                System.out.println("Prenotazione avviata!");
                 prenotazioneController.start();
                 break;
             case 2:
-                //manutenzione
-                //gestioneCinemaController.start();
-                System.out.println("ManutenzioneController started!");
-                break;
+                // go to management screen
+                System.out.println("Gestione avviata!");
+                GestioneCinemaController gestioneCinemaController = new GestioneCinemaController();
+                gestioneCinemaController.start();
         }
 
     }

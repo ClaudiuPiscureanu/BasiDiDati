@@ -28,3 +28,25 @@ entita:
 		fk_proiezione 
 		stato
 		ticket_pagamento
+
+
+
+modifica il la classe prinicpale per la gesitone del cinema. dovra gestire tutte le chiamate per i menu a cascada:
+alcune funzioni sono gia state create, se errate modificale e aggiungi quelle mancanti 
+
+operazioni del gestore del cinema: 
+GESTIONE FILM:
+	aggiungere
+	modificare 
+	eliminare
+	
+GESITONE PROIEZIONI:
+	aggiungere
+	modificare
+	eliminare
+GESITONE SALA:
+	modificare posti 
+	aggiungi sala
+	elimina sala
+
+STATISTICHE CINEMA
