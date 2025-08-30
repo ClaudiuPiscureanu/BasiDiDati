@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="dbSrc:///8e32ba09/4e1d8e2d-21ab-49fb-8d8e-f1828b57d49a/schema/claudb/routine/CreaPrenotazioneTemporanea@(smallint(5) unsigned,char(1),tinyint(3) unsigned)P.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/src/main/java/it/uniroma2/dicii/claupiscu/model/dao/PrenotazioneDao.java" dialect="GenericSQL" />
+  </component>
+</project>
